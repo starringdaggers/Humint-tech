@@ -12,386 +12,359 @@
 <style>
 
 *{
-margin:0;
-padding:0;
-box-sizing:border-box;
-font-family:'Inter',sans-serif;
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Inter',sans-serif;
 }
 
 html{
-scroll-behavior:smooth;
+    scroll-behavior:smooth;
 }
 
 body{
-background:#071722;
-color:#fff;
-overflow-x:hidden;
-min-height:100vh;
-}
+    background-color:#071722;
+    color:#fff;
+    overflow-x:hidden;
+    min-height:100vh;
 
-/* Background */
+    background-image:
+    radial-gradient(
+        circle at center,
+        rgba(13,65,90,.55) 0%,
+        rgba(7,23,34,1) 70%
+    ),
+
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1600' height='1600' viewBox='0 0 1600 1600'%3E%3Cg fill='none' stroke='%236dc8ff' stroke-opacity='0.08' stroke-width='1.2'%3E%3Cpath d='M100 200 C250 80 450 80 600 200 S950 320 1100 200 S1400 80 1500 200'/%3E%3Cpath d='M80 260 C230 140 430 140 580 260 S930 380 1080 260 S1380 140 1480 260'/%3E%3Cpath d='M60 320 C210 200 410 200 560 320 S910 440 1060 320 S1360 200 1460 320'/%3E%3Cpath d='M120 500 C260 380 460 380 620 500 S960 620 1100 500 S1420 380 1540 500'/%3E%3Cpath d='M100 560 C240 440 440 440 600 560 S940 680 1080 560 S1400 440 1520 560'/%3E%3Cpath d='M80 620 C220 500 420 500 580 620 S920 740 1060 620 S1380 500 1500 620'/%3E%3Cpath d='M180 820 C340 700 540 700 700 820 S1000 940 1140 820 S1450 700 1560 820'/%3E%3Cpath d='M160 880 C320 760 520 760 680 880 S980 1000 1120 880 S1430 760 1540 880'/%3E%3Cpath d='M140 940 C300 820 500 820 660 940 S960 1060 1100 940 S1410 820 1520 940'/%3E%3C/g%3E%3C/svg%3E");
+
+    background-size:cover;
+    background-attachment:fixed;
+}
 
 body::before{
-content:'';
-position:fixed;
-inset:0;
+    content:"";
+    position:fixed;
+    inset:0;
 
-background:
-radial-gradient(circle at center,
-rgba(15,58,80,.7) 0%,
-rgba(7,23,34,1) 70%);
+    background:
+    radial-gradient(
+        circle at center,
+        rgba(109,200,255,.08),
+        transparent 60%
+    );
 
-z-index:-3;
+    pointer-events:none;
+    z-index:-1;
 }
 
-body::after{
-content:'';
-position:fixed;
-inset:0;
-
-background-image:
-url("https://www.transparenttextures.com/patterns/cartographer.png");
-
-opacity:.15;
-
-z-index:-2;
-}
-
-/* Navigation */
+/* NAVIGATION */
 
 nav{
-width:100%;
-padding:28px 8%;
-display:flex;
-justify-content:space-between;
-align-items:center;
-position:fixed;
-top:0;
-left:0;
+    width:100%;
+    padding:28px 8%;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
 
-backdrop-filter:blur(12px);
+    position:fixed;
+    top:0;
+    left:0;
 
-background:rgba(7,23,34,.6);
+    backdrop-filter:blur(16px);
 
-border-bottom:1px solid rgba(255,255,255,.05);
+    background:rgba(7,23,34,.65);
 
-z-index:100;
+    border-bottom:1px solid rgba(255,255,255,.05);
+
+    z-index:100;
 }
 
 .logo{
-font-size:1.8rem;
-font-weight:800;
-letter-spacing:4px;
+    font-size:1.8rem;
+    font-weight:800;
+    letter-spacing:5px;
 }
 
 .nav-links{
-display:flex;
-gap:40px;
+    display:flex;
+    gap:40px;
 }
 
 .nav-links a{
-text-decoration:none;
-color:white;
-font-weight:500;
-opacity:.8;
-transition:.3s;
+    text-decoration:none;
+    color:white;
+    opacity:.8;
+    transition:.3s;
+    font-weight:500;
 }
 
 .nav-links a:hover{
-opacity:1;
+    opacity:1;
 }
 
-/* Hero */
+/* HERO */
 
 .hero{
-min-height:100vh;
+    min-height:100vh;
 
-display:flex;
-flex-direction:column;
-justify-content:center;
-align-items:center;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
 
-text-align:center;
+    text-align:center;
 
-padding:120px 20px 80px;
+    padding:120px 20px;
 }
 
 .hero h1{
-font-size:clamp(4rem,10vw,8rem);
-font-weight:800;
-letter-spacing:8px;
-
-margin-bottom:20px;
+    font-size:clamp(4rem,10vw,8rem);
+    font-weight:800;
+    letter-spacing:8px;
+    margin-bottom:20px;
 }
 
 .hero h2{
-font-size:clamp(1.2rem,2vw,2rem);
-
-font-weight:500;
-
-color:#6dc8ff;
-
-margin-bottom:25px;
+    color:#6dc8ff;
+    font-size:clamp(1.2rem,2vw,2rem);
+    margin-bottom:25px;
+    font-weight:500;
 }
 
 .hero p{
-max-width:800px;
-
-font-size:1.15rem;
-line-height:1.8;
-
-opacity:.85;
-
-margin-bottom:50px;
+    max-width:760px;
+    line-height:1.8;
+    opacity:.85;
+    font-size:1.1rem;
+    margin-bottom:50px;
 }
 
 .buttons{
-display:flex;
-gap:20px;
-flex-wrap:wrap;
-justify-content:center;
+    display:flex;
+    gap:20px;
+    flex-wrap:wrap;
+    justify-content:center;
 }
 
 .btn{
-padding:18px 34px;
-
-border-radius:10px;
-
-font-size:1rem;
-font-weight:600;
-
-cursor:pointer;
-
-transition:.3s;
+    padding:18px 36px;
+    border-radius:12px;
+    font-size:1rem;
+    font-weight:600;
+    cursor:pointer;
+    transition:.3s;
 }
 
 .btn-primary{
-background:#6dc8ff;
-color:#071722;
-border:none;
+    background:#6dc8ff;
+    color:#071722;
+    border:none;
 }
 
 .btn-primary:hover{
-transform:translateY(-2px);
+    transform:translateY(-3px);
 }
 
 .btn-secondary{
-background:transparent;
-color:white;
-
-border:1px solid rgba(255,255,255,.2);
+    background:transparent;
+    color:white;
+    border:1px solid rgba(255,255,255,.15);
 }
 
 .btn-secondary:hover{
-background:rgba(255,255,255,.05);
+    background:rgba(255,255,255,.05);
 }
 
 .note{
-margin-top:35px;
-
-font-size:.95rem;
-
-opacity:.7;
+    margin-top:35px;
+    opacity:.7;
+    font-size:.95rem;
 }
 
-/* Features */
+/* FEATURES */
 
 .features{
-width:min(1200px,92%);
-margin:auto;
-
-padding-bottom:100px;
+    width:min(1200px,92%);
+    margin:auto;
+    padding-bottom:120px;
 }
 
 .section-title{
-text-align:center;
-
-font-size:2rem;
-font-weight:700;
-
-margin-bottom:60px;
-
-letter-spacing:2px;
-
-color:#6dc8ff;
+    text-align:center;
+    color:#6dc8ff;
+    font-size:2rem;
+    letter-spacing:2px;
+    margin-bottom:60px;
 }
 
 .grid{
-display:grid;
-grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-gap:20px;
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:22px;
 }
 
 .card{
-background:rgba(11,33,48,.75);
+    background:rgba(10,30,45,.72);
+    backdrop-filter:blur(16px);
 
-border:1px solid rgba(255,255,255,.05);
+    border:1px solid rgba(255,255,255,.05);
 
-border-radius:16px;
+    border-radius:18px;
 
-padding:35px 25px;
+    padding:35px 25px;
 
-text-align:center;
-
-backdrop-filter:blur(10px);
-
-transition:.3s;
+    transition:.3s;
 }
 
 .card:hover{
-transform:translateY(-6px);
+    transform:translateY(-6px);
 }
 
 .card h3{
-margin-bottom:15px;
-font-size:1.2rem;
+    margin-bottom:15px;
+    font-size:1.15rem;
 }
 
 .card p{
-opacity:.75;
-line-height:1.7;
+    opacity:.75;
+    line-height:1.7;
 }
 
-/* Footer */
+/* FOOTER */
 
 footer{
-padding:80px 20px;
+    border-top:1px solid rgba(255,255,255,.05);
 
-text-align:center;
+    padding:80px 20px;
 
-border-top:1px solid rgba(255,255,255,.05);
+    text-align:center;
 }
 
 footer h3{
-font-size:1.8rem;
-margin-bottom:15px;
+    font-size:1.8rem;
+    margin-bottom:12px;
 }
 
 footer p{
-opacity:.65;
+    opacity:.6;
 }
+
+/* MOBILE */
 
 @media(max-width:768px){
 
-.nav-links{
-gap:20px;
-font-size:.9rem;
-}
+    nav{
+        flex-direction:column;
+        gap:15px;
+    }
 
-.hero h1{
-letter-spacing:4px;
-}
+    .nav-links{
+        gap:20px;
+        font-size:.9rem;
+    }
+
+    .hero h1{
+        letter-spacing:4px;
+    }
 
 }
 
 </style>
-
 </head>
 
 <body>
 
 <nav>
 
-<div class="logo">
-HUMINTECH
-</div>
+    <div class="logo">
+        HUMINTECH
+    </div>
 
-<div class="nav-links">
-<a href="#">Home</a>
-<a href="#">Submit Report</a>
-<a href="#">Check Submission</a>
-</div>
+    <div class="nav-links">
+        <a href="#">Home</a>
+        <a href="#">Submit Report</a>
+        <a href="#">Check Submission</a>
+    </div>
 
 </nav>
 
 <section class="hero">
 
-<h1>HUMINTECH</h1>
+    <h1>HUMINTECH</h1>
 
-<h2>
-Secure. Anonymous. Protected.
-</h2>
+    <h2>Secure. Anonymous. Protected.</h2>
 
-<p>
-HUMINTECH is a secure platform for anonymous intelligence submissions.
-Your identity remains protected while providing information that can
-assist authorized investigations and public safety efforts.
-</p>
+    <p>
+        HUMINTECH provides a secure channel for anonymous intelligence
+        submissions. Reports can be submitted without creating an account,
+        while protecting the confidentiality of contributors and their
+        supporting evidence.
+    </p>
 
-<div class="buttons">
+    <div class="buttons">
 
-<button class="btn btn-primary">
-Submit Report
-</button>
+        <button class="btn btn-primary">
+            Submit Report
+        </button>
 
-<button class="btn btn-secondary">
-Check Submission
-</button>
+        <button class="btn btn-secondary">
+            Check Submission
+        </button>
 
-</div>
+    </div>
 
-<div class="note">
-No account required. Identity never recorded.
-</div>
+    <div class="note">
+        No account required. Identity never recorded.
+    </div>
 
 </section>
 
 <section class="features">
 
-<h2 class="section-title">
-HOW IT WORKS
-</h2>
+    <h2 class="section-title">
+        HOW IT WORKS
+    </h2>
 
-<div class="grid">
+    <div class="grid">
 
-<div class="card">
-<h3>Anonymous Reporting</h3>
-<p>
-No account, phone number or email address required.
-</p>
-</div>
+        <div class="card">
+            <h3>Anonymous Reporting</h3>
+            <p>No account, phone number or email required.</p>
+        </div>
 
-<div class="card">
-<h3>Reference Code</h3>
-<p>
-Receive a unique code to track your submission.
-</p>
-</div>
+        <div class="card">
+            <h3>Reference Code</h3>
+            <p>Receive a unique code to track your submission.</p>
+        </div>
 
-<div class="card">
-<h3>Evidence Upload</h3>
-<p>
-Upload photos, videos and supporting documents.
-</p>
-</div>
+        <div class="card">
+            <h3>Evidence Upload</h3>
+            <p>Upload photos, videos and supporting documents.</p>
+        </div>
 
-<div class="card">
-<h3>Metadata Protection</h3>
-<p>
-Uploaded files are processed before storage.
-</p>
-</div>
+        <div class="card">
+            <h3>Metadata Protection</h3>
+            <p>Files are processed before storage to reduce identifying information.</p>
+        </div>
 
-<div class="card">
-<h3>Source Protection</h3>
-<p>
-Identity remains separated from submitted information.
-</p>
-</div>
+        <div class="card">
+            <h3>Source Protection</h3>
+            <p>Identity remains separated from submitted information.</p>
+        </div>
 
-</div>
+    </div>
 
 </section>
 
 <footer>
 
-<h3>
-Protecting Sources. Enabling Action.
-</h3>
+    <h3>
+        Protecting Sources. Enabling Action.
+    </h3>
 
-<p>
-© 2026 HUMINTECH. All Rights Reserved.
-</p>
+    <p>
+        © 2026 HUMINTECH
+    </p>
 
 </footer>
 

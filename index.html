@@ -1,330 +1,426 @@
-```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HUMINTECH</title>
-
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-
+<title>HUMINT-TECH — Source Portal</title>
 <style>
+  :root{
+    --bg-deep:#0d2128;
+    --bg-panel:#163842;
+    --bg-panel-2:#1b4350;
+    --line:rgba(255,255,255,0.08);
+    --text:#eef4f3;
+    --text-dim:#9fb6b9;
+    --accent:#cfe8e2;
+    --accent-strong:#ffffff;
+    --pattern:rgba(255,255,255,0.05);
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--bg-deep);
+    color:var(--text);
+    font-family:'Helvetica Neue', Arial, sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
 
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
-font-family:'Inter',sans-serif;
-}
+  /* topographic pattern echoing the HUMINT-TECH mark, used as ambient texture */
+  .topo-bg{
+    position:fixed;
+    top:0;left:0;right:0;bottom:0;
+    z-index:0;
+    background-color:var(--bg-deep);
+    background-image:
+      radial-gradient(circle at 20% 20%, rgba(255,255,255,0.05), transparent 40%),
+      radial-gradient(circle at 80% 70%, rgba(255,255,255,0.04), transparent 45%),
+      url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMjAiIGhlaWdodD0iMjIwIiB2aWV3Qm94PSIwIDAgMjIwIDIyMCI+PGcgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmZmZmZmIiBzdHJva2Utb3BhY2l0eT0iMC4xMyIgc3Ryb2tlLXdpZHRoPSIxLjMiPjxwYXRoIGQ9Ik0tMjAgNDAgUSA2MCAwIDExMCA0MCBUIDI0MCA0MCIvPjxwYXRoIGQ9Ik0tMjAgODAgUSA2MCA0MCAxMTAgODAgVCAyNDAgODAiLz48cGF0aCBkPSJNLTIwIDEyMCBRIDYwIDgwIDExMCAxMjAgVCAyNDAgMTIwIi8+PHBhdGggZD0iTS0yMCAxNjAgUSA2MCAxMjAgMTEwIDE2MCBUIDI0MCAxNjAiLz48Y2lyY2xlIGN4PSIxMTAiIGN5PSIxMTAiIHI9IjM0Ii8+PGNpcmNsZSBjeD0iMTEwIiBjeT0iMTEwIiByPSI1OCIvPjwvZz48L3N2Zz4=");
+    background-repeat:no-repeat,no-repeat,repeat;
+  }
 
-body{
-min-height:100vh;
-display:flex;
-justify-content:center;
-align-items:center;
-padding:40px;
-overflow:hidden;
-background:#08141c;
-color:white;
-position:relative;
-}
+  .panel{
+    position:relative;
+    z-index:1;
+    max-width:1100px;
+    margin:48px auto;
+    background-color:var(--bg-panel);
+    background-image:
+      linear-gradient(155deg, var(--bg-panel) 0%, var(--bg-panel-2) 100%),
+      url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMjAiIGhlaWdodD0iMjIwIiB2aWV3Qm94PSIwIDAgMjIwIDIyMCI+PGcgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmZmZmZmIiBzdHJva2Utb3BhY2l0eT0iMC4wOSIgc3Ryb2tlLXdpZHRoPSIxLjMiPjxwYXRoIGQ9Ik0tMjAgNDAgUSA2MCAwIDExMCA0MCBUIDI0MCA0MCIvPjxwYXRoIGQ9Ik0tMjAgODAgUSA2MCA0MCAxMTAgODAgVCAyNDAgODAiLz48cGF0aCBkPSJNLTIwIDEyMCBRIDYwIDgwIDExMCAxMjAgVCAyNDAgMTIwIi8+PHBhdGggZD0iTS0yMCAxNjAgUSA2MCAxMjAgMTEwIDE2MCBUIDI0MCAxNjAiLz48Y2lyY2xlIGN4PSIxMTAiIGN5PSIxMTAiIHI9IjM0Ii8+PGNpcmNsZSBjeD0iMTEwIiBjeT0iMTEwIiByPSI1OCIvPjwvZz48L3N2Zz4=");
+    border-radius:6px;
+    overflow:hidden;
+    box-shadow:0 30px 60px -20px rgba(0,0,0,0.6);
+  }
+  .panel-inner{padding:48px 56px;}
 
-/* BACKGROUND */
+  nav{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:32px 56px 0;
+  }
+  .logo{
+    font-weight:800;
+    font-size:20px;
+    letter-spacing:1px;
+  }
+  .nav-links{
+    display:flex;
+    font-size:11px;
+    letter-spacing:2px;
+    color:var(--text-dim);
+  }
+  .nav-links a{color:var(--text-dim);text-decoration:none;margin-left:28px;}
+  .nav-links a:hover{color:var(--accent-strong);}
 
-body::before{
-content:"";
-position:absolute;
-inset:0;
+  /* HERO */
+  .hero .panel-inner{
+    min-height:420px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    padding:80px 40px 60px;
+  }
+  .eyebrow{
+    font-size:11px;
+    letter-spacing:4px;
+    color:var(--text-dim);
+    margin-bottom:18px;
+  }
+  .hero h1{
+    font-size:clamp(56px,9vw,96px);
+    font-weight:800;
+    letter-spacing:1px;
+    line-height:0.95;
+    text-transform:uppercase;
+  }
+  .hero .sub{
+    margin-top:18px;
+    font-size:12px;
+    letter-spacing:3px;
+    color:var(--text-dim);
+    text-transform:uppercase;
+  }
+  .hero .cta-row{
+    margin-top:40px;
+    display:flex;
+    gap:16px;
+  }
+  .btn{
+    border:1px solid rgba(255,255,255,0.25);
+    color:var(--text);
+    background:transparent;
+    padding:13px 26px;
+    font-size:12px;
+    letter-spacing:2px;
+    text-transform:uppercase;
+    border-radius:3px;
+    cursor:pointer;
+    text-decoration:none;
+    display:inline-block;
+    transition:background 0.2s, color 0.2s;
+  }
+  .btn:hover{background:rgba(255,255,255,0.1);}
+  .btn.primary{
+    background:var(--accent-strong);
+    color:#0d2128;
+    border-color:var(--accent-strong);
+  }
+  .btn.primary:hover{background:var(--accent);}
 
-background:
-radial-gradient(circle at center,
-rgba(24,72,97,.55),
-rgba(8,20,28,1) 70%);
+  .socials{
+    position:absolute;
+    left:56px;
+    bottom:28px;
+    display:flex;
+    gap:14px;
+    font-size:13px;
+    color:var(--text-dim);
+    z-index:2;
+  }
+  .scroll-tag{
+    position:absolute;
+    right:24px;
+    bottom:28px;
+    font-size:10px;
+    letter-spacing:3px;
+    color:var(--text-dim);
+    writing-mode:vertical-rl;
+    z-index:2;
+  }
 
-z-index:-3;
-}
+  /* PROCESS / PORTFOLIO-STYLE GRID */
+  .grid-section h2{
+    text-align:center;
+    font-size:28px;
+    letter-spacing:1px;
+    text-transform:uppercase;
+    margin-bottom:8px;
+  }
+  .grid-section .lead{
+    text-align:center;
+    color:var(--text-dim);
+    font-size:13px;
+    margin-bottom:40px;
+  }
+  .tiles{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:18px;
+  }
+  .tile{
+    background:rgba(0,0,0,0.18);
+    border:1px solid var(--line);
+    border-radius:4px;
+    padding:28px 22px;
+    min-height:200px;
+    display:flex;
+    flex-direction:column;
+  }
+  .tile .num{
+    font-size:11px;
+    color:var(--text-dim);
+    letter-spacing:2px;
+    margin-bottom:14px;
+  }
+  .tile h3{
+    font-size:16px;
+    letter-spacing:0.5px;
+    margin-bottom:10px;
+    text-transform:uppercase;
+  }
+  .tile p{
+    font-size:13px;
+    line-height:1.55;
+    color:var(--text-dim);
+  }
 
-body::after{
-content:"";
-position:absolute;
-inset:0;
+  .tier-row{
+    margin-top:18px;
+    display:flex;
+    justify-content:center;
+    gap:14px;
+  }
+  .pill{
+    border:1px solid var(--line);
+    border-radius:30px;
+    padding:9px 20px;
+    font-size:11px;
+    letter-spacing:1px;
+    color:var(--text-dim);
+  }
 
-opacity:.08;
+  /* SUBMIT / CONTACT SPLIT */
+  .split{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:48px;
+  }
+  .split h2{
+    font-size:26px;
+    text-transform:uppercase;
+    letter-spacing:1px;
+    margin-bottom:18px;
+  }
+  .split p{
+    color:var(--text-dim);
+    font-size:13px;
+    line-height:1.7;
+    margin-bottom:18px;
+  }
+  .notice{
+    border-left:2px solid var(--accent-strong);
+    padding:10px 16px;
+    font-size:12px;
+    color:var(--text);
+    background:rgba(255,255,255,0.04);
+    margin-bottom:18px;
+  }
+  .field-label{
+    font-size:11px;
+    letter-spacing:1.5px;
+    color:var(--text-dim);
+    text-transform:uppercase;
+    margin-bottom:6px;
+    display:block;
+  }
+  .field{
+    margin-bottom:18px;
+  }
+  input, textarea{
+    width:100%;
+    background:rgba(0,0,0,0.25);
+    border:1px solid var(--line);
+    border-radius:3px;
+    padding:12px 14px;
+    color:var(--text);
+    font-size:13px;
+    font-family:inherit;
+  }
+  input::placeholder, textarea::placeholder{color:#6f8688;}
+  textarea{min-height:120px;resize:vertical;}
 
-background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1600' height='1200' viewBox='0 0 1600 1200'%3E%3Cg fill='none' stroke='%236dc8ff' stroke-width='1.2'%3E%3Cpath d='M0 150C150 40 350 40 500 150S850 260 1000 150S1350 40 1600 150'/%3E%3Cpath d='M0 220C150 110 350 110 500 220S850 330 1000 220S1350 110 1600 220'/%3E%3Cpath d='M0 290C150 180 350 180 500 290S850 400 1000 290S1350 180 1600 290'/%3E%3Cpath d='M0 450C150 340 350 340 500 450S850 560 1000 450S1350 340 1600 450'/%3E%3Cpath d='M0 520C150 410 350 410 500 520S850 630 1000 520S1350 410 1600 520'/%3E%3Cpath d='M0 590C150 480 350 480 500 590S850 700 1000 590S1350 480 1600 590'/%3E%3Cpath d='M0 820C150 710 350 710 500 820S850 930 1000 820S1350 710 1600 820'/%3E%3Cpath d='M0 890C150 780 350 780 500 890S850 1000 1000 890S1350 780 1600 890'/%3E%3C/svg%3E");
+  footer{
+    text-align:center;
+    padding:36px 0 60px;
+    color:var(--text-dim);
+    font-size:11px;
+    letter-spacing:1px;
+    position:relative;
+    z-index:1;
+  }
 
-background-size:cover;
+  @media (max-width:760px){
+    nav{padding:24px 24px 0;}
+    .panel-inner{padding:32px 24px;}
+    .tiles, .split{grid-template-columns:1fr;}
+    .socials{left:24px;}
+    .scroll-tag{display:none;}
+  }
 
-z-index:-2;
-}
-
-/* MAIN PANEL */
-
-.container{
-width:min(1100px,100%);
-}
-
-.card{
-
-background:rgba(14,33,44,.82);
-
-backdrop-filter:blur(16px);
-
-border:1px solid rgba(255,255,255,.06);
-
-box-shadow:
-0 30px 60px rgba(0,0,0,.45);
-
-border-radius:20px;
-
-overflow:hidden;
-}
-
-/* NAV */
-
-nav{
-display:flex;
-justify-content:space-between;
-align-items:center;
-
-padding:30px 40px;
-
-border-bottom:1px solid rgba(255,255,255,.05);
-}
-
-.logo{
-font-size:1.5rem;
-font-weight:800;
-letter-spacing:4px;
-}
-
-.nav-links{
-display:flex;
-gap:30px;
-}
-
-.nav-links a{
-color:white;
-text-decoration:none;
-opacity:.7;
-font-size:.95rem;
-}
-
-.nav-links a:hover{
-opacity:1;
-}
-
-/* HERO */
-
-.hero{
-padding:100px 60px;
-text-align:center;
-}
-
-.hero h1{
-font-size:clamp(4rem,10vw,7rem);
-font-weight:800;
-letter-spacing:8px;
-margin-bottom:15px;
-}
-
-.hero .subtitle{
-font-size:1.2rem;
-color:#7ecfff;
-margin-bottom:25px;
-}
-
-.hero p{
-max-width:700px;
-margin:auto;
-line-height:1.8;
-opacity:.8;
-margin-bottom:45px;
-}
-
-.buttons{
-display:flex;
-justify-content:center;
-gap:20px;
-flex-wrap:wrap;
-}
-
-.btn{
-padding:16px 34px;
-border-radius:12px;
-font-weight:600;
-cursor:pointer;
-transition:.3s;
-}
-
-.primary{
-background:#7ecfff;
-border:none;
-color:#08141c;
-}
-
-.secondary{
-background:transparent;
-border:1px solid rgba(255,255,255,.12);
-color:white;
-}
-
-.btn:hover{
-transform:translateY(-2px);
-}
-
-/* FEATURES */
-
-.features{
-display:grid;
-grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-gap:20px;
-
-padding:0 40px 50px;
-}
-
-.feature{
-background:rgba(255,255,255,.02);
-
-border:1px solid rgba(255,255,255,.05);
-
-padding:25px;
-
-border-radius:14px;
-}
-
-.feature h3{
-margin-bottom:12px;
-font-size:1rem;
-}
-
-.feature p{
-font-size:.92rem;
-line-height:1.6;
-opacity:.7;
-}
-
-/* FOOTER */
-
-footer{
-text-align:center;
-padding:40px;
-
-border-top:1px solid rgba(255,255,255,.05);
-
-opacity:.75;
-}
-
-footer h3{
-margin-bottom:10px;
-font-size:1.2rem;
-}
-
-@media(max-width:768px){
-
-.hero{
-padding:70px 25px;
-}
-
-nav{
-padding:20px;
-flex-direction:column;
-gap:15px;
-}
-
-.features{
-padding:0 20px 30px;
-}
-
-}
-
+  /* MODAL (passphrase reveal) */
+  .modal-overlay{
+    position:fixed;
+    top:0;left:0;right:0;bottom:0;
+    background:rgba(5,12,15,0.82);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    z-index:50;
+    padding:20px;
+  }
+  .modal-overlay.open{display:flex;}
+  .modal-card{
+    background:var(--bg-panel-2);
+    border:1px solid var(--line);
+    border-radius:6px;
+    max-width:440px;
+    width:100%;
+    padding:32px;
+    text-align:center;
+  }
+  .modal-card .eyebrow{margin-bottom:14px;}
+  .passphrase{
+    font-family:'Courier New', monospace;
+    font-size:18px;
+    letter-spacing:2px;
+    background:rgba(0,0,0,0.3);
+    padding:16px;
+    border-radius:4px;
+    margin:18px 0;
+    word-break:break-word;
+  }
+  .modal-card .warn{
+    font-size:12px;
+    color:#f3c98b;
+    margin-bottom:20px;
+    line-height:1.6;
+  }
 </style>
 </head>
-
 <body>
 
-<div class="container">
+<div class="topo-bg" aria-hidden="true"></div>
 
-<div class="card">
-
-<nav>
-
-<div class="logo">
-HUMINTECH
-</div>
-
-<div class="nav-links">
-<a href="#">Home</a>
-<a href="#">Submit Report</a>
-<a href="#">Check Submission</a>
-</div>
-
-</nav>
-
-<section class="hero">
-
-<h1>HUMINTECH</h1>
-
-<div class="subtitle">
-Secure. Anonymous. Protected.
-</div>
-
-<p>
-A secure platform for anonymous intelligence submissions,
-evidence uploads and protected communication using
-reference-based tracking.
-</p>
-
-<div class="buttons">
-
-<button class="btn primary">
-Submit Report
-</button>
-
-<button class="btn secondary">
-Check Submission
-</button>
-
-</div>
-
+<!-- ============ HERO ============ -->
+<section class="panel hero">
+  <nav>
+    <div class="logo">HE</div>
+    <div class="nav-links">
+      <a href="#how">HOW IT WORKS</a>
+      <a href="#submit">SUBMIT</a>
+    </div>
+  </nav>
+  <div class="panel-inner">
+    <div class="eyebrow">A SECURE CHANNEL FOR</div>
+    <h1>SOURCES</h1>
+    <div class="sub">HUMINT&#8209;TECH &middot; ANONYMOUS REPORTING PORTAL</div>
+    <div class="cta-row">
+      <a href="#submit" class="btn primary">Submit a Report</a>
+      <a href="#status" class="btn">Check Status</a>
+    </div>
+  </div>
+  <div class="socials">
+    <span>&#9679;</span><span>TOR</span><span>&middot;</span><span>NO ACCOUNT</span>
+  </div>
+  <div class="scroll-tag">SCROLL</div>
 </section>
 
-<section class="features">
+<!-- ============ HOW IT WORKS ============ -->
+<section class="panel grid-section" id="how">
+  <div class="panel-inner">
+    <h2>How This Protects You</h2>
+    <p class="lead">No name. No phone number. No email. Ever.</p>
+    <div class="tiles">
+      <div class="tile">
+        <div class="num">01</div>
+        <h3>You get a passphrase</h3>
+        <p>Shown once, on your screen, never stored by us. It is derived into a keypair locally, in your browser. We only ever see the public half.</p>
+      </div>
+      <div class="tile">
+        <div class="num">02</div>
+        <h3>You submit, we encrypt</h3>
+        <p>Your report and media are encrypted to your pseudonymous key before they ever touch a server. Files are stripped of EXIF and location metadata first.</p>
+      </div>
+      <div class="tile">
+        <div class="num">03</div>
+        <h3>You check back, anytime</h3>
+        <p>Re-enter your passphrase later to unlock your mailbox. No "online now" status, no read receipts &mdash; nothing that could place you anywhere.</p>
+      </div>
+    </div>
+    <div class="tier-row">
+      <span class="pill">TIER 0 &middot; Upload-only, default for every source</span>
+      <span class="pill">TIER 1 &middot; Earned analyst contact, async by default</span>
+    </div>
+  </div>
+</section>
 
-<div class="feature">
-<h3>Anonymous Reporting</h3>
-<p>No account, email or phone number required.</p>
-</div>
+<!-- ============ SUBMIT / CONTACT ============ -->
+<section class="panel" id="submit">
+  <div class="panel-inner split">
+    <div>
+      <h2>Submit a Report</h2>
+      <p>Describe what you witnessed. Be as specific as you can about location and time &mdash; you control how much you share. Attach photos or video if you have them; we strip identifying metadata automatically.</p>
+      <p>If you are in immediate danger, prioritize your own safety before submitting anything.</p>
+      <div class="notice">
+        Your IP address is never logged on this submission path. This page itself does not yet write to a server &mdash; it's a preview of the flow we're building before any real source uses it.
+      </div>
+    </div>
+    <div id="status">
+      <span class="field-label">Generate your passphrase first</span>
+      <button class="btn primary" style="width:100%;margin-bottom:24px;" onclick="document.getElementById('modalOverlay').classList.add('open')">Generate Passphrase</button>
 
-<div class="feature">
-<h3>Reference Code</h3>
-<p>Track submissions using a unique generated code.</p>
-</div>
-
-<div class="feature">
-<h3>Evidence Upload</h3>
-<p>Submit photos, videos and supporting documents.</p>
-</div>
-
-<div class="feature">
-<h3>Source Protection</h3>
-<p>Designed to separate reports from contributor identity.</p>
-</div>
-
+      <div class="field">
+        <label class="field-label">Location (state / LGA / area)</label>
+        <input type="text" placeholder="e.g. Chikun LGA, Kaduna State">
+      </div>
+      <div class="field">
+        <label class="field-label">What did you see</label>
+        <textarea placeholder="Group of armed men spotted near..."></textarea>
+      </div>
+      <div class="field">
+        <label class="field-label">Existing passphrase (to check status instead)</label>
+        <input type="text" placeholder="Enter passphrase to view replies">
+      </div>
+      <button class="btn primary" style="width:100%;">Encrypt &amp; Submit</button>
+    </div>
+  </div>
 </section>
 
 <footer>
-
-<h3>Protecting Sources. Enabling Action.</h3>
-
-<p>© HUMINTECH</p>
-
+  HUMINT&#8209;TECH &middot; Source identity is never sold, never logged, never recoverable by us &middot; &copy; 2026
 </footer>
 
-</div>
-
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal-card">
+    <div class="eyebrow">YOUR PASSPHRASE</div>
+    <div class="passphrase" id="passphraseText">correct-harbor-falcon-9214</div>
+    <div class="warn">Write this down now. We cannot show it to you again and we cannot recover it for you. Losing it means losing access to your reports.</div>
+    <button class="btn primary" onclick="document.getElementById('modalOverlay').classList.remove('open')">I've saved it</button>
+  </div>
 </div>
 
 </body>
 </html>
-```

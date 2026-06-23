@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>HUMINT-TECH — Source Portal</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
 <style>
   :root{
     --bg-deep:#0d2128;
@@ -268,6 +269,36 @@
   input::placeholder, textarea::placeholder{color:#6f8688;}
   textarea{min-height:120px;resize:vertical;}
 
+  .map-search-row{
+    display:flex;
+    gap:8px;
+    margin-bottom:10px;
+  }
+  .map-search-row input{flex:1;}
+  .map-search-row .btn{
+    padding:12px 18px;
+    flex-shrink:0;
+  }
+  #locationMap{
+    height:260px;
+    border-radius:4px;
+    border:1px solid var(--line);
+    overflow:hidden;
+    background:#0a1a1f;
+  }
+  .map-readout{
+    margin-top:10px;
+    font-size:12px;
+    color:var(--text);
+    font-family:'Courier New', monospace;
+  }
+  .map-note{
+    margin-top:6px;
+    font-size:11px;
+    color:var(--text-dim);
+    line-height:1.5;
+  }
+
   .dropzone{
     border:1.5px dashed rgba(255,255,255,0.28);
     border-radius:5px;
@@ -469,8 +500,16 @@
       <button class="btn primary" style="width:100%;margin-bottom:24px;" id="generateBtn" onclick="generatePassphrase()">Generate Passphrase</button>
 
       <div class="field">
-        <label class="field-label">Location (state / LGA / area)</label>
-        <input type="text" id="reportLocation" placeholder="e.g. Chikun LGA, Kaduna State">
+        <label class="field-label">Mark the location on the map</label>
+        <div class="map-search-row">
+          <input type="text" id="mapSearchInput" placeholder="Search a place name, e.g. Chikun LGA, Kaduna State">
+          <button type="button" class="btn" id="mapSearchBtn" onclick="searchMapLocation()">Find</button>
+        </div>
+        <div id="locationMap"></div>
+        <div class="map-readout" id="mapReadout">No location pinned yet &mdash; search above or tap/click the map to drop a pin.</div>
+        <div class="map-note">This only uses the pin you place. Your device's live GPS is never read &mdash; zoom and place the pin from memory or from a safe distance.</div>
+        <input type="hidden" id="reportLat" value="">
+        <input type="hidden" id="reportLng" value="">
       </div>
       <div class="field">
         <label class="field-label">What did you see</label>
@@ -514,6 +553,7 @@
   </div>
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script>
   // ----------------------------------------------------------------
   // Habeeb: set this once the analyst dashboard exists, then
@@ -600,23 +640,28 @@
   }
 
   function submitReport(){
-    const location = document.getElementById('reportLocation').value.trim();
+    const lat = document.getElementById('reportLat').value;
+    const lng = document.getElementById('reportLng').value;
     const details = document.getElementById('reportDetails').value.trim();
     if(!details){
       alert('Please describe what you witnessed before submitting.');
       return;
     }
+    if(!lat || !lng){
+      alert('Please pin the location on the map before submitting.');
+      return;
+    }
     if(ANALYST_DASHBOARD_URL){
-      // Once wired up, this is where the encrypted report AND the files
-      // in `selectedFiles` get sent to the analyst dashboard instead of
-      // just logging locally.
+      // Once wired up, this is where the encrypted report, the pinned
+      // coordinates, and the files in `selectedFiles` get sent to the
+      // analyst dashboard instead of just logging locally.
       window.location.href = ANALYST_DASHBOARD_URL;
       return;
     }
     const fileNote = selectedFiles.length
       ? ` ${selectedFiles.length} file(s) were attached and would be stripped of metadata, encrypted, and sent along with it.`
       : '';
-    alert('Preview only: this front end is not yet connected to the analyst dashboard. Your report was not sent anywhere.' + fileNote);
+    alert(`Preview only: this front end is not yet connected to the analyst dashboard. Your report (pinned at ${lat}, ${lng}) was not sent anywhere.${fileNote}`);
   }
 
   function checkStatus(){
@@ -633,6 +678,72 @@
   }
 
   document.addEventListener('DOMContentLoaded', refreshHelperUI);
+
+  // ---------- location map (pin-drop only, no live device GPS) ----------
+  let map, marker;
+
+  function initLocationMap(){
+    const mapEl = document.getElementById('locationMap');
+    if(!mapEl || typeof L === 'undefined') return;
+
+    map = L.map('locationMap', { attributionControl: false }).setView([9.082, 8.6753], 6); // Nigeria-wide default view
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19
+    }).addTo(map);
+
+    map.on('click', function(e){
+      placePin(e.latlng.lat, e.latlng.lng);
+    });
+  }
+
+  function placePin(lat, lng){
+    if(!map) return;
+    if(marker){
+      marker.setLatLng([lat, lng]);
+    } else {
+      marker = L.marker([lat, lng], { draggable: true }).addTo(map);
+      marker.on('dragend', function(){
+        const pos = marker.getLatLng();
+        updateReadout(pos.lat, pos.lng);
+      });
+    }
+    updateReadout(lat, lng);
+  }
+
+  function updateReadout(lat, lng){
+    document.getElementById('reportLat').value = lat.toFixed(6);
+    document.getElementById('reportLng').value = lng.toFixed(6);
+    document.getElementById('mapReadout').textContent =
+      `Pinned: ${lat.toFixed(5)}, ${lng.toFixed(5)} — drag the pin to adjust.`;
+  }
+
+  async function searchMapLocation(){
+    const query = document.getElementById('mapSearchInput').value.trim();
+    if(!query) return;
+    const btn = document.getElementById('mapSearchBtn');
+    const original = btn.textContent;
+    btn.textContent = '...';
+    try {
+      const url = `https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(query)}`;
+      const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
+      const results = await res.json();
+      if(results && results.length){
+        const { lat, lon } = results[0];
+        const latNum = parseFloat(lat), lngNum = parseFloat(lon);
+        map.setView([latNum, lngNum], 14);
+        placePin(latNum, lngNum);
+      } else {
+        alert('No match found for that place name — try zooming/panning the map and tapping directly instead.');
+      }
+    } catch(err){
+      alert('Search is unavailable right now — you can still tap the map directly to drop a pin.');
+    } finally {
+      btn.textContent = original;
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', initLocationMap);
 
   // ---------- file uploads ----------
   let selectedFiles = [];

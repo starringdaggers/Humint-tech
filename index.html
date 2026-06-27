@@ -55,14 +55,7 @@
     padding:32px 56px 0;
   }
   .brand-mark{display:flex;align-items:center;gap:10px;text-decoration:none;}
-  .brand-mark .mark{
-    width:34px;height:34px;border-radius:50%;
-    border:1.5px solid var(--accent);
-    display:flex;align-items:center;justify-content:center;
-    font-size:13px;font-weight:800;letter-spacing:0;
-    color:var(--accent-strong);
-    flex-shrink:0;
-  }
+  .brand-mark .logo-mark{flex-shrink:0;}
   .brand-mark .brand-text{font-weight:800;font-size:15px;letter-spacing:3px;color:var(--text);line-height:1;}
   .brand-mark .brand-text small{display:block;font-size:8px;font-weight:400;letter-spacing:2.5px;color:var(--text-dim);margin-top:4px;}
   .nav-links{display:flex;align-items:center;flex-wrap:wrap;font-size:11px;letter-spacing:2px;color:var(--text-dim);}
@@ -127,35 +120,119 @@
   .identity-status.ready .dot{background:var(--good);}
   .identity-headline{font-size:13px;color:var(--text);margin-top:6px;line-height:1.6;}
 
-  /* ---- offline location picker ---- */
-  .map-mock{
-    position:relative;
-    width:100%;
-    height:240px;
-    border-radius:5px;
-    overflow:hidden;
+  /* ---- offline drill-down location picker ---- */
+  .location-picker{
     border:1px solid var(--line);
-    background:#102b32;
-    cursor:crosshair;
+    border-radius:6px;
+    background:#0f2a32;
+    overflow:hidden;
     user-select:none;
   }
-  .map-mock svg{display:block;width:100%;height:100%;}
-  .map-mock .state-shape{
-    fill:#1c4450;
-    stroke:rgba(255,255,255,0.12);
-    stroke-width:1;
-    transition:fill 0.15s;
+  .lp-breadcrumb{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    padding:14px 16px;
+    border-bottom:1px solid var(--line);
+    font-size:11px;
+    letter-spacing:0.5px;
+    color:var(--text-dim);
+    flex-wrap:wrap;
   }
-  .map-mock .state-shape:hover{fill:#23535f;}
-  .pin-readout{text-align:center;margin-top:8px;font-size:12px;color:var(--text);font-family:'Courier New', monospace;}
-  .map-note{margin-top:6px;font-size:11px;color:var(--text-dim);line-height:1.5;text-align:center;}
-  .precision-row{display:flex;justify-content:center;gap:8px;margin-top:12px;}
-  .precision-pill{
-    background:rgba(0,0,0,0.2);border:1px solid var(--line);color:var(--text-dim);
-    font-size:11px;letter-spacing:1px;text-transform:uppercase;padding:7px 16px;border-radius:30px;
-    cursor:pointer;transition:background 0.2s, color 0.2s, border-color 0.2s;
+  .lp-breadcrumb .crumb{
+    color:var(--text-dim);
+    cursor:pointer;
+    padding:3px 8px;
+    border-radius:30px;
+    transition:background 0.15s, color 0.15s;
   }
-  .precision-pill.active{background:var(--accent-strong);color:#0d2128;border-color:var(--accent-strong);}
+  .lp-breadcrumb .crumb:hover{background:rgba(255,255,255,0.08);color:var(--text);}
+  .lp-breadcrumb .crumb.current{color:var(--accent-strong);font-weight:600;cursor:default;}
+  .lp-breadcrumb .crumb.current:hover{background:none;}
+  .lp-breadcrumb .sep{color:var(--text-dim);opacity:0.4;}
+
+  .lp-body{
+    padding:16px;
+    min-height:200px;
+  }
+  .lp-grid{
+    display:grid;
+    grid-template-columns:repeat(2, 1fr);
+    gap:8px;
+    animation:lpFadeIn 0.18s ease-out;
+  }
+  @media (min-width:480px){
+    .lp-grid{grid-template-columns:repeat(3, 1fr);}
+  }
+  @keyframes lpFadeIn{
+    from{opacity:0; transform:translateY(4px);}
+    to{opacity:1; transform:translateY(0);}
+  }
+  .lp-tile{
+    background:rgba(255,255,255,0.04);
+    border:1px solid var(--line);
+    border-radius:5px;
+    padding:14px 10px;
+    text-align:center;
+    font-size:12.5px;
+    color:var(--text);
+    cursor:pointer;
+    transition:background 0.15s, border-color 0.15s, transform 0.1s;
+    line-height:1.35;
+  }
+  .lp-tile:hover{
+    background:rgba(143,217,196,0.1);
+    border-color:var(--good);
+    transform:translateY(-1px);
+  }
+  .lp-tile:active{transform:translateY(0);}
+  .lp-tile .lp-tile-sub{display:block;font-size:10.5px;color:var(--text-dim);margin-top:3px;}
+
+  .lp-stop-row{
+    margin-top:14px;
+    padding-top:14px;
+    border-top:1px solid var(--line);
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    flex-wrap:wrap;
+  }
+  .lp-stop-row .lp-current-note{font-size:11.5px;color:var(--text-dim);line-height:1.5;flex:1;min-width:160px;}
+  .lp-stop-btn{
+    background:var(--accent-strong);color:#0d2128;border:none;
+    font-size:11px;letter-spacing:1px;text-transform:uppercase;font-weight:600;
+    padding:9px 16px;border-radius:30px;cursor:pointer;white-space:nowrap;
+    transition:background 0.15s;
+  }
+  .lp-stop-btn:hover{background:var(--accent);}
+
+  .lp-final{
+    text-align:center;
+    padding:18px 8px;
+  }
+  .lp-final .lp-final-icon{font-size:22px;color:var(--good);margin-bottom:8px;}
+  .lp-final .lp-final-label{font-size:13.5px;color:var(--text);margin-bottom:4px;}
+  .lp-final .lp-final-sub{font-size:11.5px;color:var(--text-dim);}
+  .lp-final .lp-change-btn{
+    margin-top:14px;
+    background:transparent;border:1px solid var(--line);color:var(--text-dim);
+    font-size:10.5px;letter-spacing:1px;text-transform:uppercase;
+    padding:7px 14px;border-radius:30px;cursor:pointer;
+  }
+  .lp-final .lp-change-btn:hover{color:var(--text);border-color:var(--accent);}
+
+  .lp-skip-row{
+    padding:10px 16px;
+    border-top:1px solid var(--line);
+    text-align:center;
+  }
+  .lp-skip-row button{
+    background:none;border:none;color:var(--text-dim);
+    font-size:11px;letter-spacing:0.5px;text-decoration:underline;cursor:pointer;
+  }
+  .lp-skip-row button:hover{color:var(--text);}
+  .map-note{margin-top:8px;font-size:11px;color:var(--text-dim);line-height:1.5;text-align:center;}
 
   .dropzone{
     border:1.5px dashed rgba(255,255,255,0.28);border-radius:5px;padding:24px 20px;text-align:center;
@@ -225,7 +302,44 @@
 <section class="panel hero">
   <nav>
     <a class="brand-mark" href="#">
-      <span class="mark">H</span>
+      <svg class="logo-mark" width="30" height="30" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <defs>
+          <linearGradient id="hmetal" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="var(--accent-strong)"/>
+            <stop offset="55%" stop-color="var(--accent)"/>
+            <stop offset="100%" stop-color="var(--text-dim)"/>
+          </linearGradient>
+        </defs>
+        <!-- the "h" as a doorway: left post, arched lintel, right post -->
+        <path d="M18 16
+                 L18 84
+                 L32 84
+                 L32 46
+                 Q32 30 48 30
+                 L62 30
+                 Q70 30 70 38
+                 L70 84
+                 L84 84
+                 L84 38
+                 Q84 16 62 16
+                 L32 16
+                 Z"
+              fill="url(#hmetal)" fill-rule="evenodd"/>
+        <!-- door seam down the middle of the doorway opening -->
+        <line x1="51" y1="44" x2="51" y2="84" stroke="var(--bg-panel-2)" stroke-width="2.5"/>
+        <!-- doorknob -->
+        <circle cx="45" cy="68" r="1.8" fill="var(--accent-strong)"/>
+        <!-- shield-with-check badge at the top of the doorway -->
+        <path d="M51 38
+                 L58 41
+                 L58 48
+                 Q58 54 51 57
+                 Q44 54 44 48
+                 L44 41
+                 Z"
+              fill="none" stroke="var(--accent-strong)" stroke-width="1.8" stroke-linejoin="round"/>
+        <path d="M48 47.5 L50.5 50 L54.5 45" fill="none" stroke="var(--accent-strong)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
       <span class="brand-text">HUMINTECH<small>SOURCE PORTAL</small></span>
     </a>
     <div class="nav-links">
@@ -253,19 +367,20 @@
       <div class="tile">
         <div class="num">01</div>
         <h3>You create a passphrase</h3>
-        <p>Generated on your device. Shown to you exactly once. The moment you confirm you've saved it, we delete our only copy — from then on, only you have it.</p>
+        <p>Generated on your device, shown once. The moment you confirm it, we delete our only copy.</p>
       </div>
       <div class="tile">
         <div class="num">02</div>
-        <h3>Your passphrase is your identity</h3>
-        <p>There's no username, no password reset, no "forgot passphrase" link. The same way a Web3 wallet works — whoever holds the phrase holds the access. We can't recover it, and we can't be made to hand it over, because we never have it.</p>
+        <h3>It's your only identity here</h3>
+        <p>No username, no password reset. Whoever holds the phrase holds the access — including you.</p>
       </div>
       <div class="tile">
         <div class="num">03</div>
-        <h3>You come back anytime</h3>
-        <p>Re-enter your passphrase later to view replies. No login history, no "last seen," nothing that places you anywhere in time or space.</p>
+        <h3>Come back anytime</h3>
+        <p>Re-enter it later to check for replies. No login history, no record of when you visit.</p>
       </div>
     </div>
+    <p class="lead" style="margin-top:24px;font-size:11px;"><a href="#" style="color:var(--text-dim);text-decoration:underline;">Read the full security writeup</a></p>
   </div>
 </section>
 
@@ -274,13 +389,9 @@
   <div class="panel-inner split">
     <div>
       <h2>Submit a Report</h2>
-      <p>Describe what you witnessed. You control how much detail you share about location — a general area is enough. Attach photos or video if you have them.</p>
-      <p>If you are in immediate danger, prioritize your own safety before submitting anything.</p>
+      <p>Describe what you witnessed. A general area is enough — you control how specific to get. If you're in immediate danger, your safety comes first.</p>
       <div class="notice">
-        This page never asks for your name, number, or email, and we never log your IP on submission. Nothing on this screen contacts an outside map or location service — the picker below works entirely offline, on your device.
-      </div>
-      <div class="notice warn">
-        This is a design preview. Encryption, metadata stripping, and the analyst handoff described here are the security model we are building toward — this mock does not yet submit anywhere.
+        No name, number, or email is ever asked for. The location picker works entirely offline. This is a design preview — submissions aren't connected to a server yet.
       </div>
     </div>
 
@@ -293,7 +404,7 @@
           <span id="identityStatusText">No passphrase created yet on this device</span>
         </div>
         <div class="identity-headline" id="identityHeadline">
-          You'll need a passphrase to submit a report or check for replies. It's generated locally and we never store it — write it down somewhere safe when it's shown to you.
+          Needed to submit a report or check for replies. Generated locally — write it down when shown; we never store it.
         </div>
       </div>
 
@@ -301,15 +412,14 @@
 
       <div class="field">
         <label class="field-label">Mark the general area (optional)</label>
-        <div class="map-mock" id="mapMock" tabindex="0" role="img" aria-label="Tap or click a region of Nigeria to mark a general area">
-          <!-- simplified offline region picker, no external map/network calls -->
+        <div class="location-picker" id="locationPicker">
+          <div class="lp-breadcrumb" id="lpBreadcrumb"></div>
+          <div class="lp-body" id="lpBody"></div>
+          <div class="lp-skip-row">
+            <button type="button" onclick="skipLocation()">Don't share a location for this report</button>
+          </div>
         </div>
-        <div class="pin-readout" id="pinReadout">No area marked &mdash; tap a region, or leave blank.</div>
-        <div class="precision-row">
-          <button type="button" class="precision-pill active" id="precRegion" onclick="setPrecision('region')">Region only</button>
-          <button type="button" class="precision-pill" id="precNone" onclick="setPrecision('none')">Don't share location</button>
-        </div>
-        <div class="map-note">This is a simplified offline map — it never loads tiles or sends searches anywhere. Your device's real GPS location is never read.</div>
+        <div class="map-note">Offline picker — no map tiles, searches, or GPS used. Stop at any level; broader is safer.</div>
       </div>
 
       <div class="field">
@@ -323,7 +433,7 @@
           <div class="dropzone-icon">&#8593;</div>
           <div class="dropzone-text">
             <strong>Tap to upload</strong> or drag files here
-            <div class="dropzone-sub">In the live version, metadata such as location and device info is stripped from files automatically before they're encrypted &mdash; that step isn't active in this preview.</div>
+            <div class="dropzone-sub">Location and device metadata is stripped before encryption in the live version &mdash; not active in this preview.</div>
           </div>
           <input type="file" id="fileInput" accept="image/*,video/*" multiple style="display:none;" onchange="handleFiles(this.files)">
         </div>
@@ -462,7 +572,7 @@
     }
     // Proof of possession succeeded. This is the moment our copy dies.
     hasConfirmedIdentity = true;
-    setIdentityStatus(true, 'Passphrase confirmed on this device', 'Saved it somewhere safe? Good — that\'s the only copy that exists now. Re-enter it below anytime to check for replies.');
+    setIdentityStatus(true, 'Passphrase confirmed on this device', 'That\'s the only copy that exists now. Re-enter it below to check for replies.');
     showModalStep('stepDestroyed');
     pendingPassphrase = null; // destroyed: cleared from the only place it lived
     document.getElementById('passphraseText').textContent = '\u2014';
@@ -480,103 +590,394 @@
 
   document.addEventListener('DOMContentLoaded', function(){
     setIdentityStatus(false, 'No passphrase created yet on this device',
-      "You'll need a passphrase to submit a report or check for replies. It's generated locally and we never store it — write it down somewhere safe when it's shown to you.");
+      'Needed to submit a report or check for replies. Generated locally — write it down when shown; we never store it.');
   });
 
   // ------------------------------------------------------------------
-  // OFFLINE LOCATION PICKER
+  // OFFLINE DRILL-DOWN LOCATION PICKER
   //
-  // Deliberately not a real map. No tile server, no geocoding API, no
-  // network request of any kind — all of those would leak the source's
-  // IP and approximate location to a third party (or to us) at the
-  // exact moment they're describing something sensitive. Instead this
-  // is a coarse, self-contained region grid drawn with SVG, sized so a
-  // source can only ever indicate "roughly this area," never a precise
-  // point — which is also safer for the source even if location-sharing
-  // is fully trusted, since precise coordinates are themselves a
-  // re-identification risk.
+  // Deliberately not a real map and not real GPS. No tile server, no
+  // geocoding API, no network request of any kind — those would leak
+  // the source's IP and approximate location to a third party (or to
+  // us) at the exact moment they're describing something sensitive.
+  //
+  // The drill-down (Zone -> State -> rough area within state) gives a
+  // satisfying, app-like narrowing experience, but the deepest level is
+  // intentionally still coarse — generic directional buckets, not real
+  // wards or LGAs. We never let granularity get fine enough to become
+  // a re-identification risk on its own. At every level there's a
+  // visible "use this" action, so a source can stop wherever they're
+  // comfortable; nothing forces them to go deeper than they want to.
   // ------------------------------------------------------------------
 
-  const REGIONS = [
-    {id:'nw', name:'North West',   x:10,  y:10,  w:170, h:110},
-    {id:'ne', name:'North East',   x:190, y:10,  w:170, h:110},
-    {id:'nc', name:'North Central',x:100, y:130, w:170, h:90},
-    {id:'sw', name:'South West',   x:10,  y:230, w:140, h:90},
-    {id:'sc', name:'South South',  x:160, y:230, w:140, h:90},
-    {id:'se', name:'South East',   x:310, y:230, w:120, h:90},
+  const GEO = {
+    nw: {
+      label: 'North West',
+      states: {
+        kaduna: { label: 'Kaduna' },
+        kano: { label: 'Kano', lgas: [
+          'Ajingi','Albasu','Bagwai','Bebeji','Bichi','Bunkure','Dala','Dambatta',
+          'Dawakin Kudu','Dawakin Tofa','Doguwa','Fagge','Gabasawa','Garko','Garun Mallam',
+          'Gaya','Gezawa','Gwale','Gwarzo','Kabo','Kano Municipal','Karaye','Kibiya','Kiru',
+          'Kumbotso','Kunchi','Kura','Madobi','Makoda','Minjibir','Nasarawa','Rano',
+          'Rimin Gado','Rogo','Shanono','Sumaila','Takai','Tarauni','Tofa','Tsanyawa',
+          'Tudun Wada','Ungogo','Warawa','Wudil',
+        ] },
+        katsina: { label: 'Katsina' },
+        kebbi: { label: 'Kebbi' },
+        sokoto: { label: 'Sokoto' },
+        zamfara: { label: 'Zamfara' },
+        jigawa: { label: 'Jigawa' },
+      }
+    },
+    ne: {
+      label: 'North East',
+      states: {
+        borno: { label: 'Borno', lgas: [
+          'Abadam','Askira/Uba','Bama','Bayo','Biu','Chibok','Damboa','Dikwa','Gubio',
+          'Guzamala','Gwoza','Hawul','Jere','Kaga','Kala/Balge','Konduga','Kukawa',
+          'Kwaya Kusar','Mafa','Magumeri','Maiduguri','Marte','Mobbar','Monguno','Ngala',
+          'Nganzai','Shani',
+        ] },
+        adamawa: { label: 'Adamawa' },
+        bauchi: { label: 'Bauchi' },
+        gombe: { label: 'Gombe' },
+        taraba: { label: 'Taraba' },
+        yobe: { label: 'Yobe' },
+      }
+    },
+    nc: {
+      label: 'North Central',
+      states: {
+        niger: { label: 'Niger' },
+        kwara: { label: 'Kwara' },
+        kogi: { label: 'Kogi' },
+        benue: { label: 'Benue' },
+        plateau: { label: 'Plateau' },
+        nasarawa: { label: 'Nasarawa' },
+        fct: { label: 'FCT Abuja', lgas: [
+          'Abaji','Abuja Municipal (AMAC)','Bwari','Gwagwalada','Kuje','Kwali',
+        ] },
+      }
+    },
+    sw: {
+      label: 'South West',
+      states: {
+        lagos: { label: 'Lagos', lgas: [
+          'Agege','Ajeromi-Ifelodun','Alimosho','Amuwo-Odofin','Apapa','Badagry',
+          'Epe','Eti-Osa','Ibeju-Lekki','Ifako-Ijaiye','Ikeja','Ikorodu','Kosofe',
+          'Lagos Island','Lagos Mainland','Mushin','Ojo','Oshodi-Isolo','Shomolu',
+          'Surulere',
+        ] },
+        ogun: { label: 'Ogun' },
+        oyo: { label: 'Oyo' },
+        osun: { label: 'Osun' },
+        ondo: { label: 'Ondo' },
+        ekiti: { label: 'Ekiti' },
+      }
+    },
+    ss: {
+      label: 'South South',
+      states: {
+        rivers: { label: 'Rivers', lgas: [
+          'Abua/Odual','Ahoada East','Ahoada West','Akuku-Toru','Andoni','Asari-Toru',
+          'Bonny','Degema','Eleme','Emohua','Etche','Gokana','Ikwerre','Khana',
+          'Obio/Akpor','Ogba/Egbema/Ndoni','Ogu/Bolo','Okrika','Omuma','Opobo/Nkoro',
+          'Oyigbo','Port Harcourt','Tai',
+        ] },
+        delta: { label: 'Delta' },
+        crossriver: { label: 'Cross River' },
+        akwaibom: { label: 'Akwa Ibom' },
+        bayelsa: { label: 'Bayelsa' },
+        edo: { label: 'Edo' },
+      }
+    },
+    se: {
+      label: 'South East',
+      states: {
+        anambra: { label: 'Anambra', lgas: [
+          'Aguata','Anambra East','Anambra West','Anaocha','Awka North','Awka South',
+          'Ayamelum','Dunukofia','Ekwusigo','Idemili North','Idemili South','Ihiala',
+          'Njikoka','Nnewi North','Nnewi South','Ogbaru','Onitsha North','Onitsha South',
+          'Orumba North','Orumba South','Oyi',
+        ] },
+        imo: { label: 'Imo' },
+        enugu: { label: 'Enugu' },
+        abia: { label: 'Abia' },
+        ebonyi: { label: 'Ebonyi' },
+      }
+    },
+  };
+
+  // Deliberately generic — not real wards/LGAs. This is the deepest
+  // level the picker will ever offer, on purpose.
+  const SUBAREAS = [
+    { id: 'capital', label: 'Around the state capital', sub: 'most populated area' },
+    { id: 'north',   label: 'Northern part of the state', sub: '' },
+    { id: 'south',   label: 'Southern part of the state', sub: '' },
+    { id: 'east',    label: 'Eastern part of the state', sub: '' },
+    { id: 'west',    label: 'Western part of the state', sub: '' },
+    { id: 'border',  label: 'Near a state border', sub: 'not sure exactly which side' },
   ];
 
-  let selectedRegion = null;
-  let locationPrecision = 'region';
+  // lp.level: 'zone' | 'state' | 'subarea' | 'lga' | 'done'
+  // 'lga' is reached only via an explicit, optional link from 'subarea' —
+  // never the default path. Not every state has LGA data yet; when it
+  // doesn't, the option to go deeper simply isn't offered.
+  // lp.zoneId / lp.stateId / lp.subId track the deepest selections made.
+  const lp = {
+    level: 'zone',
+    zoneId: null,
+    stateId: null,
+    subId: null,
+    lgaId: null,
+    skipped: false,
+  };
 
-  function buildMapMock(){
-    const container = document.getElementById('mapMock');
-    const svg = document.createElementNS('http://www.w3.org/2000/svg','svg');
-    svg.setAttribute('viewBox','0 0 440 330');
-    svg.setAttribute('preserveAspectRatio','xMidYMid meet');
+  function lpZoneLabel(){ return lp.zoneId ? GEO[lp.zoneId].label : null; }
+  function lpStateLabel(){ return (lp.zoneId && lp.stateId) ? GEO[lp.zoneId].states[lp.stateId].label : null; }
+  function lpSubLabel(){
+    if(!lp.subId) return null;
+    const found = SUBAREAS.find(s => s.id === lp.subId);
+    return found ? found.label : null;
+  }
+  function lpStateLgas(){
+    if(!lp.zoneId || !lp.stateId) return null;
+    const state = GEO[lp.zoneId].states[lp.stateId];
+    return state.lgas || null;
+  }
+  function lpLgaLabel(){ return lp.lgaId || null; }
 
-    REGIONS.forEach(r => {
-      const rect = document.createElementNS('http://www.w3.org/2000/svg','rect');
-      rect.setAttribute('x', r.x);
-      rect.setAttribute('y', r.y);
-      rect.setAttribute('width', r.w);
-      rect.setAttribute('height', r.h);
-      rect.setAttribute('rx', 6);
-      rect.setAttribute('class','state-shape');
-      rect.setAttribute('data-region', r.id);
-      rect.style.cursor = 'pointer';
-      rect.addEventListener('click', () => selectRegion(r.id, r.name));
-
-      const label = document.createElementNS('http://www.w3.org/2000/svg','text');
-      label.setAttribute('x', r.x + r.w/2);
-      label.setAttribute('y', r.y + r.h/2 + 4);
-      label.setAttribute('text-anchor','middle');
-      label.setAttribute('font-size','11');
-      label.setAttribute('fill','#cfe8e2');
-      label.setAttribute('font-family','Helvetica Neue, Arial, sans-serif');
-      label.style.pointerEvents = 'none';
-      label.textContent = r.name;
-
-      svg.appendChild(rect);
-      svg.appendChild(label);
-    });
-
-    container.appendChild(svg);
+  // What we'd actually attach to the report right now, at whatever
+  // depth the source has stopped at (or hasn't started at all).
+  // The LGA tier is optional and deeper than subarea — if present, it's
+  // the most specific thing we know; otherwise fall back up the chain.
+  function currentLocationSummary(){
+    if(lp.skipped) return null;
+    if(lp.lgaId) return `${lpLgaLabel()} LGA, ${lpStateLabel()} State, ${lpZoneLabel()} zone`;
+    if(lp.subId) return `${lpSubLabel()}, ${lpStateLabel()} State, ${lpZoneLabel()} zone`;
+    if(lp.stateId) return `${lpStateLabel()} State, ${lpZoneLabel()} zone`;
+    if(lp.zoneId) return `${lpZoneLabel()} zone`;
+    return null;
   }
 
-  function selectRegion(id, name){
-    if(locationPrecision === 'none'){
-      // user explicitly opted out — re-clicking the map shouldn't silently re-enable it
+  function renderBreadcrumb(){
+    const el = document.getElementById('lpBreadcrumb');
+    const parts = [];
+    parts.push({ label: 'Zone', go: () => goToLevel('zone') });
+    if(lp.zoneId) parts.push({ label: lpZoneLabel(), go: () => goToLevel('state') });
+    if(lp.stateId) parts.push({ label: lpStateLabel(), go: () => goToLevel('subarea') });
+    if(lp.subId) parts.push({ label: lpSubLabel(), go: lp.lgaId ? () => goToLevel('lga') : null });
+    if(lp.lgaId) parts.push({ label: lpLgaLabel(), go: null });
+
+    el.innerHTML = '';
+    parts.forEach((p, i) => {
+      if(i > 0){
+        const sep = document.createElement('span');
+        sep.className = 'sep';
+        sep.textContent = '›';
+        el.appendChild(sep);
+      }
+      const isLast = i === parts.length - 1;
+      const crumb = document.createElement('span');
+      crumb.className = 'crumb' + (isLast ? ' current' : '');
+      crumb.textContent = p.label;
+      if(!isLast && p.go){
+        crumb.addEventListener('click', p.go);
+      }
+      el.appendChild(crumb);
+    });
+  }
+
+  function goToLevel(level){
+    lp.skipped = false;
+    if(level === 'zone'){ lp.level = 'zone'; lp.lgaId = null; }
+    else if(level === 'state'){ lp.level = 'state'; lp.stateId = null; lp.subId = null; lp.lgaId = null; }
+    else if(level === 'subarea'){ lp.level = 'subarea'; lp.subId = null; lp.lgaId = null; }
+    else if(level === 'lga'){ lp.level = 'lga'; lp.lgaId = null; }
+    renderLocationPicker();
+  }
+
+  function lpSelectZone(zoneId){
+    lp.zoneId = zoneId;
+    lp.stateId = null;
+    lp.subId = null;
+    lp.lgaId = null;
+    lp.level = 'state';
+    lp.skipped = false;
+    renderLocationPicker();
+  }
+
+  function lpSelectState(stateId){
+    lp.stateId = stateId;
+    lp.subId = null;
+    lp.lgaId = null;
+    lp.level = 'subarea';
+    renderLocationPicker();
+  }
+
+  function lpSelectSubarea(subId){
+    lp.subId = subId;
+    lp.level = 'done';
+    renderLocationPicker();
+  }
+
+  // Reached only by the source explicitly choosing to go deeper —
+  // never triggered automatically by picking a subarea.
+  function lpOfferLga(){
+    lp.level = 'lga';
+    renderLocationPicker();
+  }
+
+  function lpSelectLga(lgaName){
+    lp.lgaId = lgaName;
+    lp.level = 'done';
+    renderLocationPicker();
+  }
+
+  function lpStopHere(){
+    // Commit to whatever's currently selected, however deep that is.
+    lp.level = 'done';
+    renderLocationPicker();
+  }
+
+  function lpChangeLocation(){
+    lp.level = 'zone';
+    lp.zoneId = null;
+    lp.stateId = null;
+    lp.subId = null;
+    lp.lgaId = null;
+    lp.skipped = false;
+    renderLocationPicker();
+  }
+
+  function skipLocation(){
+    lp.skipped = true;
+    lp.level = 'zone';
+    lp.zoneId = null;
+    lp.stateId = null;
+    lp.subId = null;
+    lp.lgaId = null;
+    renderLocationPicker();
+  }
+
+  function renderLocationPicker(){
+    renderBreadcrumb();
+    const body = document.getElementById('lpBody');
+    body.innerHTML = '';
+
+    if(lp.skipped){
+      const wrap = document.createElement('div');
+      wrap.className = 'lp-final';
+      wrap.innerHTML = `
+        <div class="lp-final-icon">&mdash;</div>
+        <div class="lp-final-label">No location will be shared with this report.</div>
+        <div class="lp-final-sub">You can change that anytime before submitting.</div>
+        <button type="button" class="lp-change-btn" onclick="lpChangeLocation()">Actually, let me mark an area</button>
+      `;
+      body.appendChild(wrap);
       return;
     }
-    selectedRegion = name;
-    document.querySelectorAll('.state-shape').forEach(el => {
-      el.style.fill = (el.getAttribute('data-region') === id) ? '#3a7d6e' : '';
-    });
-    document.getElementById('pinReadout').textContent = `Marked area: ${name} — that's all we'll know.`;
-  }
 
-  function setPrecision(mode){
-    locationPrecision = mode;
-    document.getElementById('precRegion').classList.toggle('active', mode === 'region');
-    document.getElementById('precNone').classList.toggle('active', mode === 'none');
-    const mapEl = document.getElementById('mapMock');
-    if(mode === 'none'){
-      selectedRegion = null;
-      document.querySelectorAll('.state-shape').forEach(el => el.style.fill = '');
-      document.getElementById('pinReadout').textContent = "Location won't be shared with this report.";
-      mapEl.style.opacity = '0.35';
-      mapEl.style.pointerEvents = 'none';
-    } else {
-      mapEl.style.opacity = '1';
-      mapEl.style.pointerEvents = 'auto';
-      document.getElementById('pinReadout').textContent = selectedRegion
-        ? `Marked area: ${selectedRegion} — that's all we'll know.`
-        : 'No area marked — tap a region, or leave blank.';
+    if(lp.level === 'done'){
+      const wrap = document.createElement('div');
+      wrap.className = 'lp-final';
+      wrap.innerHTML = `
+        <div class="lp-final-icon">&#10003;</div>
+        <div class="lp-final-label">${currentLocationSummary()}</div>
+        <div class="lp-final-sub">That's all the location detail attached to this report.</div>
+        <button type="button" class="lp-change-btn" onclick="lpChangeLocation()">Change area</button>
+      `;
+      body.appendChild(wrap);
+      return;
+    }
+
+    const grid = document.createElement('div');
+    grid.className = 'lp-grid';
+
+    if(lp.level === 'zone'){
+      Object.keys(GEO).forEach(zoneId => {
+        const tile = document.createElement('div');
+        tile.className = 'lp-tile';
+        tile.textContent = GEO[zoneId].label;
+        tile.addEventListener('click', () => lpSelectZone(zoneId));
+        grid.appendChild(tile);
+      });
+    } else if(lp.level === 'state'){
+      const states = GEO[lp.zoneId].states;
+      Object.keys(states).forEach(stateId => {
+        const tile = document.createElement('div');
+        tile.className = 'lp-tile';
+        tile.textContent = states[stateId].label;
+        tile.addEventListener('click', () => lpSelectState(stateId));
+        grid.appendChild(tile);
+      });
+    } else if(lp.level === 'subarea'){
+      SUBAREAS.forEach(s => {
+        const tile = document.createElement('div');
+        tile.className = 'lp-tile';
+        tile.innerHTML = s.sub
+          ? `${s.label}<span class="lp-tile-sub">${s.sub}</span>`
+          : s.label;
+        tile.addEventListener('click', () => lpSelectSubarea(s.id));
+        grid.appendChild(tile);
+      });
+    } else if(lp.level === 'lga'){
+      const lgas = lpStateLgas();
+      if(!lgas){
+        body.appendChild(grid); // empty grid, nothing to render
+        const note = document.createElement('div');
+        note.className = 'lp-current-note';
+        note.style.padding = '4px 2px 12px';
+        note.textContent = `Local government area list isn't added yet for ${lpStateLabel()} State. You can still use the state or area level above.`;
+        body.appendChild(note);
+        const backRow = document.createElement('div');
+        backRow.className = 'lp-stop-row';
+        backRow.innerHTML = `<div class="lp-current-note"></div><button type="button" class="lp-stop-btn" onclick="goToLevel('subarea')">Go back</button>`;
+        body.appendChild(backRow);
+        return;
+      }
+      lgas.forEach(name => {
+        const tile = document.createElement('div');
+        tile.className = 'lp-tile';
+        tile.textContent = name;
+        tile.addEventListener('click', () => lpSelectLga(name));
+        grid.appendChild(tile);
+      });
+    }
+
+    body.appendChild(grid);
+
+    // Optional, explicit invitation to go one level deeper than
+    // subarea — never automatic, never required. Only shown when we
+    // actually have LGA data for the selected state.
+    if(lp.level === 'subarea' && lpStateLgas()){
+      const deeper = document.createElement('div');
+      deeper.style.textAlign = 'center';
+      deeper.style.marginTop = '10px';
+      deeper.innerHTML = `<button type="button" style="background:none;border:none;color:var(--text-dim);font-size:11px;text-decoration:underline;cursor:pointer;" onclick="lpOfferLga()">Narrow to a specific local government area (optional)</button>`;
+      body.appendChild(deeper);
+    }
+
+    // "Stop here" is always visible once at least the zone is picked —
+    // a source should never feel forced to drill all the way down.
+    if(lp.level !== 'zone' || lp.zoneId){
+      const stopRow = document.createElement('div');
+      stopRow.className = 'lp-stop-row';
+      const currentDepthLabel = lp.level === 'state'
+        ? `Currently: ${lpZoneLabel()} zone`
+        : (lp.level === 'subarea' || lp.level === 'lga')
+          ? `Currently: ${lpStateLabel()} State, ${lpZoneLabel()} zone`
+          : '';
+      stopRow.innerHTML = `
+        <div class="lp-current-note">${currentDepthLabel ? currentDepthLabel + ' — that\'s already enough, if you\'d rather not narrow further.' : ''}</div>
+        <button type="button" class="lp-stop-btn" onclick="lpStopHere()">Use this as my location</button>
+      `;
+      body.appendChild(stopRow);
     }
   }
 
-  document.addEventListener('DOMContentLoaded', buildMapMock);
+  document.addEventListener('DOMContentLoaded', renderLocationPicker);
 
   // ------------------------------------------------------------------
   // SUBMIT / STATUS (preview only — see notice in the UI)
@@ -592,9 +993,8 @@
       alert('Please describe what you witnessed before submitting.');
       return;
     }
-    const locationNote = locationPrecision === 'none'
-      ? 'no location shared'
-      : (selectedRegion ? `area: ${selectedRegion}` : 'no area marked');
+    const locationSummary = currentLocationSummary();
+    const locationNote = locationSummary ? `area: ${locationSummary}` : 'no location shared';
     const fileNote = selectedFiles.length
       ? ` ${selectedFiles.length} file(s) were attached.`
       : '';

@@ -186,6 +186,10 @@
     transform:translateY(-1px);
   }
   .lp-tile:active{transform:translateY(0);}
+  .lp-tile.lp-tile-selected{
+    background:rgba(143,217,196,0.16);
+    border-color:var(--good);
+  }
   .lp-tile .lp-tile-sub{display:block;font-size:10.5px;color:var(--text-dim);margin-top:3px;}
 
   .lp-stop-row{
@@ -254,6 +258,42 @@
   .file-chip button:hover{color:var(--accent-strong);}
 
   footer{text-align:center;padding:36px 0 60px;color:var(--text-dim);font-size:11px;letter-spacing:1px;position:relative;z-index:1;}
+  .footer-note{
+    max-width:560px;
+    margin:0 auto 22px;
+    padding:0 24px;
+    font-size:13px;
+    line-height:1.7;
+    letter-spacing:0.2px;
+    font-style:italic;
+    color:var(--text);
+    opacity:0.85;
+  }
+
+  /* On wide viewports (roughly 13"+ laptop and up) there's real empty
+     margin beside the centered panel — move the note there instead of
+     leaving it stranded in the footer below the fold. It's positioned
+     against the page itself (not the viewport), so it scrolls along
+     with the content beside it rather than floating fixed in place.
+     Below the breakpoint it stays exactly where it was: a normal block
+     sitting above the copyright line. */
+  @media (min-width:1400px){
+    body{position:relative;}
+    .footer-note{
+      position:absolute;
+      left:40px;
+      max-width:240px;
+      margin:0;
+      padding:0;
+      text-align:left;
+      font-size:14px;
+      line-height:1.75;
+      z-index:2;
+      /* top is set by JS, aligned to the Submit section — see
+         positionFooterNote() — so it tracks real layout instead of a
+         guessed pixel offset that would drift as content changes. */
+    }
+  }
 
   @media (max-width:760px){
     nav{padding:24px 24px 0;flex-wrap:wrap;row-gap:14px;}
@@ -452,6 +492,7 @@
 </section>
 
 <footer>
+  <p class="footer-note">To everyone who has trusted this portal with something they witnessed: thank you. Coming forward is not a small thing, and we don't take it lightly. Whatever you choose to share, however much or little, it matters &mdash; and so does your safety. We built this to protect that trust, not to ask more of you than you're willing to give.</p>
   HUMINT&#8209;TECH &middot; Source identity is never stored, never logged, never recoverable by us &middot; &copy; 2026
 </footer>
 
@@ -709,53 +750,70 @@
     },
   };
 
-  // Deliberately generic — not real wards/LGAs. This is the deepest
-  // level the picker will ever offer, on purpose.
-  const SUBAREAS = [
-    { id: 'capital', label: 'Around the state capital', sub: 'most populated area' },
-    { id: 'north',   label: 'Northern part of the state', sub: '' },
-    { id: 'south',   label: 'Southern part of the state', sub: '' },
-    { id: 'east',    label: 'Eastern part of the state', sub: '' },
-    { id: 'west',    label: 'Western part of the state', sub: '' },
-    { id: 'border',  label: 'Near a state border', sub: 'not sure exactly which side' },
+  // Optional, voluntary tier offered only after an LGA has been picked.
+  // These are landmark *categories*, not specific named places — we do
+  // not have a verified list of real junctions/markets for every LGA,
+  // and inventing place names would mean fabricating facts. A source
+  // who recognizes a category can tap it and, if they want to, type
+  // the actual local name themselves in the free-text field. Nothing
+  // here is required to proceed.
+  const LANDMARK_TYPES = [
+    { id: 'junction', label: 'A named junction or roundabout' },
+    { id: 'market',   label: 'A market' },
+    { id: 'park',     label: 'A motor park or bus stop' },
+    { id: 'school',   label: 'A school' },
+    { id: 'hospital',  label: 'A hospital or clinic' },
+    { id: 'worship',  label: 'A church or mosque' },
+    { id: 'govt',     label: 'A government or police building' },
+    { id: 'fuel',     label: 'A filling station' },
   ];
 
-  // lp.level: 'zone' | 'state' | 'subarea' | 'lga' | 'done'
-  // 'lga' is reached only via an explicit, optional link from 'subarea' —
-  // never the default path. Not every state has LGA data yet; when it
-  // doesn't, the option to go deeper simply isn't offered.
-  // lp.zoneId / lp.stateId / lp.subId track the deepest selections made.
+  // lp.level: 'zone' | 'state' | 'lga' | 'landmark' | 'done'
+  // 'landmark' is reached only after an LGA is picked, and only if the
+  // source chooses to go there — it is never required, and "Use this
+  // as my location" is available the moment an LGA is selected, before
+  // the landmark step is ever shown. Not every state has LGA data yet;
+  // when it doesn't, the picker simply stops offering depth at state
+  // level — there is no obligation to invent data we don't have.
+  // lp.zoneId / lp.stateId / lp.lgaId / lp.landmarkType / lp.landmarkNote
+  // track the deepest selections made.
   const lp = {
     level: 'zone',
     zoneId: null,
     stateId: null,
-    subId: null,
     lgaId: null,
+    landmarkType: null,
+    landmarkNote: '',
     skipped: false,
   };
 
   function lpZoneLabel(){ return lp.zoneId ? GEO[lp.zoneId].label : null; }
   function lpStateLabel(){ return (lp.zoneId && lp.stateId) ? GEO[lp.zoneId].states[lp.stateId].label : null; }
-  function lpSubLabel(){
-    if(!lp.subId) return null;
-    const found = SUBAREAS.find(s => s.id === lp.subId);
-    return found ? found.label : null;
-  }
   function lpStateLgas(){
     if(!lp.zoneId || !lp.stateId) return null;
     const state = GEO[lp.zoneId].states[lp.stateId];
     return state.lgas || null;
   }
   function lpLgaLabel(){ return lp.lgaId || null; }
+  function lpLandmarkTypeLabel(){
+    if(!lp.landmarkType) return null;
+    const found = LANDMARK_TYPES.find(t => t.id === lp.landmarkType);
+    return found ? found.label : null;
+  }
+  // What's shown for the landmark in summaries/breadcrumb: the source's
+  // own typed-in name if they gave one, otherwise just the category.
+  function lpLandmarkDisplay(){
+    if(!lp.landmarkType) return null;
+    const note = lp.landmarkNote.trim();
+    return note ? `${note} (${lpLandmarkTypeLabel()})` : lpLandmarkTypeLabel();
+  }
 
   // What we'd actually attach to the report right now, at whatever
   // depth the source has stopped at (or hasn't started at all).
-  // The LGA tier is optional and deeper than subarea — if present, it's
-  // the most specific thing we know; otherwise fall back up the chain.
   function currentLocationSummary(){
     if(lp.skipped) return null;
+    if(lp.landmarkType) return `${lpLandmarkDisplay()}, ${lpLgaLabel()} LGA, ${lpStateLabel()} State, ${lpZoneLabel()} zone`;
     if(lp.lgaId) return `${lpLgaLabel()} LGA, ${lpStateLabel()} State, ${lpZoneLabel()} zone`;
-    if(lp.subId) return `${lpSubLabel()}, ${lpStateLabel()} State, ${lpZoneLabel()} zone`;
     if(lp.stateId) return `${lpStateLabel()} State, ${lpZoneLabel()} zone`;
     if(lp.zoneId) return `${lpZoneLabel()} zone`;
     return null;
@@ -766,9 +824,9 @@
     const parts = [];
     parts.push({ label: 'Zone', go: () => goToLevel('zone') });
     if(lp.zoneId) parts.push({ label: lpZoneLabel(), go: () => goToLevel('state') });
-    if(lp.stateId) parts.push({ label: lpStateLabel(), go: () => goToLevel('subarea') });
-    if(lp.subId) parts.push({ label: lpSubLabel(), go: lp.lgaId ? () => goToLevel('lga') : null });
-    if(lp.lgaId) parts.push({ label: lpLgaLabel(), go: null });
+    if(lp.stateId) parts.push({ label: lpStateLabel(), go: () => goToLevel('lga') });
+    if(lp.lgaId) parts.push({ label: lpLgaLabel(), go: lp.landmarkType ? () => goToLevel('landmark') : null });
+    if(lp.landmarkType) parts.push({ label: lpLandmarkDisplay(), go: null });
 
     el.innerHTML = '';
     parts.forEach((p, i) => {
@@ -791,18 +849,18 @@
 
   function goToLevel(level){
     lp.skipped = false;
-    if(level === 'zone'){ lp.level = 'zone'; lp.lgaId = null; }
-    else if(level === 'state'){ lp.level = 'state'; lp.stateId = null; lp.subId = null; lp.lgaId = null; }
-    else if(level === 'subarea'){ lp.level = 'subarea'; lp.subId = null; lp.lgaId = null; }
-    else if(level === 'lga'){ lp.level = 'lga'; lp.lgaId = null; }
+    if(level === 'zone'){ lp.level = 'zone'; lp.lgaId = null; lp.landmarkType = null; }
+    else if(level === 'state'){ lp.level = 'state'; lp.stateId = null; lp.lgaId = null; lp.landmarkType = null; }
+    else if(level === 'lga'){ lp.level = 'lga'; lp.lgaId = null; lp.landmarkType = null; }
+    else if(level === 'landmark'){ lp.level = 'landmark'; lp.landmarkType = null; }
     renderLocationPicker();
   }
 
   function lpSelectZone(zoneId){
     lp.zoneId = zoneId;
     lp.stateId = null;
-    lp.subId = null;
     lp.lgaId = null;
+    lp.landmarkType = null;
     lp.level = 'state';
     lp.skipped = false;
     renderLocationPicker();
@@ -810,27 +868,45 @@
 
   function lpSelectState(stateId){
     lp.stateId = stateId;
-    lp.subId = null;
     lp.lgaId = null;
-    lp.level = 'subarea';
-    renderLocationPicker();
-  }
-
-  function lpSelectSubarea(subId){
-    lp.subId = subId;
-    lp.level = 'done';
-    renderLocationPicker();
-  }
-
-  // Reached only by the source explicitly choosing to go deeper —
-  // never triggered automatically by picking a subarea.
-  function lpOfferLga(){
-    lp.level = 'lga';
+    lp.landmarkType = null;
+    // States without verified LGA data go straight to "done" — we
+    // don't force a dead-end screen for data we don't have.
+    lp.level = lpStateLgas() ? 'lga' : 'done';
     renderLocationPicker();
   }
 
   function lpSelectLga(lgaName){
     lp.lgaId = lgaName;
+    lp.landmarkType = null;
+    lp.landmarkNote = '';
+    // Stopping at the LGA is the default outcome of selecting one.
+    // Going further to the landmark step is a separate, visible choice.
+    lp.level = 'done';
+    renderLocationPicker();
+  }
+
+  // Reached only by the source explicitly choosing to go deeper —
+  // never triggered automatically by picking an LGA.
+  function lpOfferLandmark(){
+    lp.level = 'landmark';
+    renderLocationPicker();
+  }
+
+  function lpSelectLandmarkType(typeId){
+    lp.landmarkType = typeId;
+    renderLocationPicker();
+  }
+
+  function lpLandmarkNoteChanged(value){
+    lp.landmarkNote = value;
+    // Update the live summary without a full re-render, so the text
+    // field doesn't lose focus on every keystroke.
+    const finalNote = document.getElementById('lpFinalNoteTarget');
+    if(finalNote) finalNote.textContent = lpLandmarkDisplay();
+  }
+
+  function lpConfirmLandmark(){
     lp.level = 'done';
     renderLocationPicker();
   }
@@ -845,8 +921,9 @@
     lp.level = 'zone';
     lp.zoneId = null;
     lp.stateId = null;
-    lp.subId = null;
     lp.lgaId = null;
+    lp.landmarkType = null;
+    lp.landmarkNote = '';
     lp.skipped = false;
     renderLocationPicker();
   }
@@ -856,8 +933,9 @@
     lp.level = 'zone';
     lp.zoneId = null;
     lp.stateId = null;
-    lp.subId = null;
     lp.lgaId = null;
+    lp.landmarkType = null;
+    lp.landmarkNote = '';
     renderLocationPicker();
   }
 
@@ -889,6 +967,17 @@
         <button type="button" class="lp-change-btn" onclick="lpChangeLocation()">Change area</button>
       `;
       body.appendChild(wrap);
+
+      // Stopped right at an LGA, haven't gone further yet — offer the
+      // optional landmark step as a separate, visible, skippable choice.
+      if(lp.lgaId && !lp.landmarkType){
+        const deeper = document.createElement('div');
+        deeper.style.textAlign = 'center';
+        deeper.style.marginTop = '4px';
+        deeper.style.paddingBottom = '16px';
+        deeper.innerHTML = `<button type="button" style="background:none;border:none;color:var(--text-dim);font-size:11px;text-decoration:underline;cursor:pointer;" onclick="lpOfferLandmark()">Name a nearby junction or landmark (optional)</button>`;
+        body.appendChild(deeper);
+      }
       return;
     }
 
@@ -903,6 +992,7 @@
         tile.addEventListener('click', () => lpSelectZone(zoneId));
         grid.appendChild(tile);
       });
+      body.appendChild(grid);
     } else if(lp.level === 'state'){
       const states = GEO[lp.zoneId].states;
       Object.keys(states).forEach(stateId => {
@@ -912,31 +1002,9 @@
         tile.addEventListener('click', () => lpSelectState(stateId));
         grid.appendChild(tile);
       });
-    } else if(lp.level === 'subarea'){
-      SUBAREAS.forEach(s => {
-        const tile = document.createElement('div');
-        tile.className = 'lp-tile';
-        tile.innerHTML = s.sub
-          ? `${s.label}<span class="lp-tile-sub">${s.sub}</span>`
-          : s.label;
-        tile.addEventListener('click', () => lpSelectSubarea(s.id));
-        grid.appendChild(tile);
-      });
+      body.appendChild(grid);
     } else if(lp.level === 'lga'){
       const lgas = lpStateLgas();
-      if(!lgas){
-        body.appendChild(grid); // empty grid, nothing to render
-        const note = document.createElement('div');
-        note.className = 'lp-current-note';
-        note.style.padding = '4px 2px 12px';
-        note.textContent = `Local government area list isn't added yet for ${lpStateLabel()} State. You can still use the state or area level above.`;
-        body.appendChild(note);
-        const backRow = document.createElement('div');
-        backRow.className = 'lp-stop-row';
-        backRow.innerHTML = `<div class="lp-current-note"></div><button type="button" class="lp-stop-btn" onclick="goToLevel('subarea')">Go back</button>`;
-        body.appendChild(backRow);
-        return;
-      }
       lgas.forEach(name => {
         const tile = document.createElement('div');
         tile.className = 'lp-tile';
@@ -944,21 +1012,40 @@
         tile.addEventListener('click', () => lpSelectLga(name));
         grid.appendChild(tile);
       });
+      body.appendChild(grid);
+    } else if(lp.level === 'landmark'){
+      // Entirely voluntary sub-step: pick a landmark category, and
+      // optionally type the actual local name. Either part can be
+      // skipped — "Confirm" works even with nothing filled in below,
+      // since this whole step is opt-in to begin with.
+      LANDMARK_TYPES.forEach(t => {
+        const tile = document.createElement('div');
+        tile.className = 'lp-tile' + (lp.landmarkType === t.id ? ' lp-tile-selected' : '');
+        tile.textContent = t.label;
+        tile.addEventListener('click', () => lpSelectLandmarkType(t.id));
+        grid.appendChild(tile);
+      });
+      body.appendChild(grid);
+
+      const noteWrap = document.createElement('div');
+      noteWrap.style.marginTop = '12px';
+      noteWrap.innerHTML = `
+        <label class="field-label" style="margin-bottom:6px;">Name it, if you want to (optional)</label>
+        <input type="text" id="lpLandmarkInput" placeholder="e.g. the name everyone local calls it"
+          value="${lp.landmarkNote.replace(/"/g, '&quot;')}" />
+      `;
+      body.appendChild(noteWrap);
+      noteWrap.querySelector('#lpLandmarkInput').addEventListener('input', (e) => lpLandmarkNoteChanged(e.target.value));
+
+      const confirmRow = document.createElement('div');
+      confirmRow.className = 'lp-stop-row';
+      confirmRow.innerHTML = `
+        <div class="lp-current-note">You can confirm with or without picking a category above — this step is entirely optional.</div>
+        <button type="button" class="lp-stop-btn" onclick="lpConfirmLandmark()">Confirm</button>
+      `;
+      body.appendChild(confirmRow);
+      return;
     }
-
-    body.appendChild(grid);
-
-    // Optional, explicit invitation to go one level deeper than
-    // subarea — never automatic, never required. Only shown when we
-    // actually have LGA data for the selected state.
-    if(lp.level === 'subarea' && lpStateLgas()){
-      const deeper = document.createElement('div');
-      deeper.style.textAlign = 'center';
-      deeper.style.marginTop = '10px';
-      deeper.innerHTML = `<button type="button" style="background:none;border:none;color:var(--text-dim);font-size:11px;text-decoration:underline;cursor:pointer;" onclick="lpOfferLga()">Narrow to a specific local government area (optional)</button>`;
-      body.appendChild(deeper);
-    }
-
     // "Stop here" is always visible once at least the zone is picked —
     // a source should never feel forced to drill all the way down.
     if(lp.level !== 'zone' || lp.zoneId){
@@ -966,7 +1053,7 @@
       stopRow.className = 'lp-stop-row';
       const currentDepthLabel = lp.level === 'state'
         ? `Currently: ${lpZoneLabel()} zone`
-        : (lp.level === 'subarea' || lp.level === 'lga')
+        : lp.level === 'lga'
           ? `Currently: ${lpStateLabel()} State, ${lpZoneLabel()} zone`
           : '';
       stopRow.innerHTML = `
@@ -1062,6 +1149,35 @@
       }
     });
   });
+
+  // ------------------------------------------------------------------
+  // Wide-screen footer note placement.
+  //
+  // Below 1400px the note stays in normal flow, above the footer's
+  // copyright line — its original position. Above that width, the CSS
+  // switches it to position:absolute against the page, and this lines
+  // its vertical position up with the middle of the Submit section
+  // (where the location picker and form live), rather than a guessed
+  // pixel offset that would drift whenever copy or layout changes.
+  // ------------------------------------------------------------------
+  function positionFooterNote(){
+    const note = document.querySelector('.footer-note');
+    const target = document.getElementById('submit');
+    if(!note || !target) return;
+    if(window.innerWidth < 1400){
+      note.style.top = '';
+      return;
+    }
+    const rect = target.getBoundingClientRect();
+    const sectionMiddle = window.scrollY + rect.top + (rect.height / 2);
+    note.style.top = `${sectionMiddle}px`;
+  }
+
+  window.addEventListener('load', positionFooterNote);
+  window.addEventListener('resize', positionFooterNote);
+  // Layout can also shift as the location picker expands/collapses
+  // between levels — recalculate shortly after any picker interaction.
+  document.addEventListener('click', () => setTimeout(positionFooterNote, 60));
 </script>
 </body>
 </html>

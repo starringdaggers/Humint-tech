@@ -16,6 +16,9 @@
     --accent-strong:#ffffff;
     --warn:#f3c98b;
     --good:#8fd9c4;
+    --olive:#9a9163;
+    --olive-dim:rgba(154,145,99,0.35);
+    --mono:'JetBrains Mono','Courier New',monospace;
   }
   *{margin:0;padding:0;box-sizing:border-box;}
   html{scroll-behavior:smooth;}
@@ -48,6 +51,72 @@
   }
   .panel-inner{padding:48px 56px;}
 
+  .classification-bar{
+    background:#10242b;
+    border-bottom:1px solid var(--olive-dim);
+    padding:7px 24px;
+    display:flex;
+    justify-content:center;
+    gap:28px;
+    flex-wrap:wrap;
+    font-family:var(--mono);
+    font-size:10px;
+    letter-spacing:1.5px;
+    color:var(--olive);
+    text-transform:uppercase;
+    position:relative;
+    z-index:2;
+  }
+  .classification-bar span{opacity:0.9;}
+  .classification-bar .sep{color:var(--olive-dim);}
+
+  /* Signature element: HUD-style corner brackets, used sparingly on
+     one or two key panels (hero, identity box) rather than everywhere
+     — a quiet nod to a tactical/targeting frame without turning the
+     whole page into a HUD. */
+  .tac-corners{position:relative;}
+  .tac-corners::before, .tac-corners::after{
+    content:'';
+    position:absolute;
+    width:18px; height:18px;
+    pointer-events:none;
+    opacity:0.55;
+  }
+  .tac-corners::before{
+    top:10px; left:10px;
+    border-top:1.5px solid var(--olive);
+    border-left:1.5px solid var(--olive);
+  }
+  .tac-corners::after{
+    bottom:10px; right:10px;
+    border-bottom:1.5px solid var(--olive);
+    border-right:1.5px solid var(--olive);
+  }
+  .tac-corners .tac-corner-tr, .tac-corners .tac-corner-bl{
+    position:absolute;
+    width:18px; height:18px;
+    pointer-events:none;
+    opacity:0.55;
+  }
+  .tac-corners .tac-corner-tr{
+    top:10px; right:10px;
+    border-top:1.5px solid var(--olive);
+    border-right:1.5px solid var(--olive);
+  }
+  .tac-corners .tac-corner-bl{
+    bottom:10px; left:10px;
+    border-bottom:1.5px solid var(--olive);
+    border-left:1.5px solid var(--olive);
+  }
+
+  .tac-label{
+    font-family:var(--mono);
+    font-size:10px;
+    letter-spacing:2px;
+    text-transform:uppercase;
+    color:var(--olive);
+  }
+
   nav{
     display:flex;
     justify-content:space-between;
@@ -67,7 +136,7 @@
     display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;
     padding:72px 40px 56px;
   }
-  .eyebrow{font-size:11px;letter-spacing:4px;color:var(--text-dim);margin-bottom:18px;}
+  .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:4px;color:var(--olive);margin-bottom:18px;}
   .hero h1{font-size:clamp(48px,8vw,84px);font-weight:800;letter-spacing:1px;line-height:0.95;text-transform:uppercase;}
   .hero .sub{margin-top:18px;font-size:12px;letter-spacing:3px;color:var(--text-dim);text-transform:uppercase;}
   .hero .cta-row{margin-top:40px;display:flex;gap:16px;}
@@ -108,7 +177,7 @@
   /* ---- identity step ---- */
   .identity-box{
     border:1px solid var(--line);
-    border-radius:5px;
+    border-radius:2px;
     padding:22px;
     background:rgba(0,0,0,0.15);
     margin-bottom:18px;
@@ -134,6 +203,7 @@
     gap:6px;
     padding:14px 16px;
     border-bottom:1px solid var(--line);
+    font-family:var(--mono);
     font-size:11px;
     letter-spacing:0.5px;
     color:var(--text-dim);
@@ -338,8 +408,18 @@
 
 <div class="topo-bg" aria-hidden="true"></div>
 
+<div class="classification-bar">
+  <span>SOURCE-PROTECTED CHANNEL</span>
+  <span class="sep">/</span>
+  <span>NO IDENTITY ON RECORD</span>
+  <span class="sep">/</span>
+  <span>HUMINT&#8209;TECH</span>
+</div>
+
 <!-- ============ HERO ============ -->
-<section class="panel hero">
+<section class="panel hero tac-corners">
+  <span class="tac-corner-tr"></span>
+  <span class="tac-corner-bl"></span>
   <nav>
     <a class="brand-mark" href="#">
       <svg class="logo-mark" width="30" height="30" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -438,7 +518,9 @@
     <div id="status">
 
       <!-- IDENTITY STEP -->
-      <div class="identity-box">
+      <div class="identity-box tac-corners">
+        <span class="tac-corner-tr"></span>
+        <span class="tac-corner-bl"></span>
         <div class="identity-status" id="identityStatus">
           <span class="dot"></span>
           <span id="identityStatusText">No passphrase created yet on this device</span>
@@ -937,6 +1019,7 @@
     lgaId: null,
     landmarkType: null,
     landmarkNote: '',
+    streetArea: '',
     skipped: false,
   };
 
@@ -965,11 +1048,14 @@
   // depth the source has stopped at (or hasn't started at all).
   function currentLocationSummary(){
     if(lp.skipped) return null;
-    if(lp.landmarkType) return `${lpLandmarkDisplay()}, ${lpLgaLabel()} LGA, ${lpStateLabel()} State, ${lpZoneLabel()} zone`;
-    if(lp.lgaId) return `${lpLgaLabel()} LGA, ${lpStateLabel()} State, ${lpZoneLabel()} zone`;
-    if(lp.stateId) return `${lpStateLabel()} State, ${lpZoneLabel()} zone`;
-    if(lp.zoneId) return `${lpZoneLabel()} zone`;
-    return null;
+    let base;
+    if(lp.landmarkType) base = `${lpLandmarkDisplay()}, ${lpLgaLabel()} LGA, ${lpStateLabel()} State, ${lpZoneLabel()} zone`;
+    else if(lp.lgaId) base = `${lpLgaLabel()} LGA, ${lpStateLabel()} State, ${lpZoneLabel()} zone`;
+    else if(lp.stateId) base = `${lpStateLabel()} State, ${lpZoneLabel()} zone`;
+    else if(lp.zoneId) base = `${lpZoneLabel()} zone`;
+    else return null;
+    const street = lp.streetArea.trim();
+    return street ? `${street}, ${base}` : base;
   }
 
   function renderBreadcrumb(){
@@ -1002,9 +1088,9 @@
 
   function goToLevel(level){
     lp.skipped = false;
-    if(level === 'zone'){ lp.level = 'zone'; lp.lgaId = null; lp.landmarkType = null; }
-    else if(level === 'state'){ lp.level = 'state'; lp.stateId = null; lp.lgaId = null; lp.landmarkType = null; }
-    else if(level === 'lga'){ lp.level = 'lga'; lp.lgaId = null; lp.landmarkType = null; }
+    if(level === 'zone'){ lp.level = 'zone'; lp.lgaId = null; lp.landmarkType = null; lp.streetArea = ''; }
+    else if(level === 'state'){ lp.level = 'state'; lp.stateId = null; lp.lgaId = null; lp.landmarkType = null; lp.streetArea = ''; }
+    else if(level === 'lga'){ lp.level = 'lga'; lp.lgaId = null; lp.landmarkType = null; lp.streetArea = ''; }
     else if(level === 'landmark'){ lp.level = 'landmark'; lp.landmarkType = null; }
     renderLocationPicker();
   }
@@ -1014,6 +1100,7 @@
     lp.stateId = null;
     lp.lgaId = null;
     lp.landmarkType = null;
+    lp.streetArea = '';
     lp.level = 'state';
     lp.skipped = false;
     renderLocationPicker();
@@ -1023,6 +1110,7 @@
     lp.stateId = stateId;
     lp.lgaId = null;
     lp.landmarkType = null;
+    lp.streetArea = '';
     // States without verified LGA data go straight to "done" — we
     // don't force a dead-end screen for data we don't have.
     lp.level = lpStateLgas() ? 'lga' : 'done';
@@ -1033,6 +1121,7 @@
     lp.lgaId = lgaName;
     lp.landmarkType = null;
     lp.landmarkNote = '';
+    lp.streetArea = '';
     // Stopping at the LGA is the default outcome of selecting one.
     // Going further to the landmark step is a separate, visible choice.
     lp.level = 'done';
@@ -1052,11 +1141,21 @@
   }
 
   function lpLandmarkNoteChanged(value){
+    // Just update state here — the source is on the 'landmark' screen
+    // while typing, and the summary label only exists on the 'done'
+    // screen, which renders fresh (with this value included) the
+    // moment they confirm via lpConfirmLandmark().
     lp.landmarkNote = value;
-    // Update the live summary without a full re-render, so the text
-    // field doesn't lose focus on every keystroke.
-    const finalNote = document.getElementById('lpFinalNoteTarget');
-    if(finalNote) finalNote.textContent = lpLandmarkDisplay();
+  }
+
+  function lpStreetAreaChanged(value){
+    lp.streetArea = value;
+    // This field lives on the same screen as the summary label, so a
+    // live patch here actually helps — unlike the landmark note field,
+    // which is on a different screen and gets picked up naturally
+    // when the source confirms and the 'done' screen re-renders.
+    const label = document.getElementById('lpFinalNoteTarget');
+    if(label) label.textContent = currentLocationSummary();
   }
 
   function lpConfirmLandmark(){
@@ -1077,6 +1176,7 @@
     lp.lgaId = null;
     lp.landmarkType = null;
     lp.landmarkNote = '';
+    lp.streetArea = '';
     lp.skipped = false;
     renderLocationPicker();
   }
@@ -1089,6 +1189,7 @@
     lp.lgaId = null;
     lp.landmarkType = null;
     lp.landmarkNote = '';
+    lp.streetArea = '';
     renderLocationPicker();
   }
 
@@ -1115,11 +1216,26 @@
       wrap.className = 'lp-final';
       wrap.innerHTML = `
         <div class="lp-final-icon">&#10003;</div>
-        <div class="lp-final-label">${currentLocationSummary()}</div>
+        <div class="lp-final-label" id="lpFinalNoteTarget">${currentLocationSummary()}</div>
         <div class="lp-final-sub">That's all the location detail attached to this report.</div>
         <button type="button" class="lp-change-btn" onclick="lpChangeLocation()">Change area</button>
       `;
       body.appendChild(wrap);
+
+      // Entirely voluntary: a free-text area or street name, separate
+      // from the landmark-category step below. A source can fill in
+      // either, both, or neither — nothing here is required to submit.
+      if(lp.lgaId){
+        const streetWrap = document.createElement('div');
+        streetWrap.style.padding = '0 4px 14px';
+        streetWrap.innerHTML = `
+          <label class="field-label" style="margin-bottom:6px;">Area or street, if you want to add one (optional)</label>
+          <input type="text" id="lpStreetInput" placeholder="e.g. a street name or neighborhood you know it by"
+            value="${lp.streetArea.replace(/"/g, '&quot;')}" />
+        `;
+        body.appendChild(streetWrap);
+        streetWrap.querySelector('#lpStreetInput').addEventListener('input', (e) => lpStreetAreaChanged(e.target.value));
+      }
 
       // Stopped right at an LGA, haven't gone further yet — offer the
       // optional landmark step as a separate, visible, skippable choice.
